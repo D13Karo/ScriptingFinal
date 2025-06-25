@@ -1,287 +1,426 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import summerTop from './images/SummerTop.jpg'; 
-import blueTopFlower from './images/BlueTop.jpg';
-import blackBlouse from './images/BlackBlouse.jpg';
-import greenSkirt from './images/GreenSkirt.jpg';
-import CureTShirt from './images/TheCureTShirt.jpg';
-import CureTShirtBlack from './images/TheCureTShirtBlack.jpg';
-import DarkBlueJeans from './images/DarkDenimJeans.jpg';
-import LightBlueBaggyJeans from './images/LightBlueBaggyJeans.jpg';
-import GirlBag from './images/GirlBag.jpg';
-import GirlCloth from './images/GirlCloth.jpg';
-import GirlShoes from './images/GirlShoes.jpg';
-import BoyBag from './images/BoyBag.jpg';
-import BoyCloth from './images/BoyCloth.jpg';
-import BoyShoes from './images/BoyShoes.jpg';
+import React, { useState, createContext, useContext } from 'react';
+import { FaShoppingCart } from 'react-icons/fa';
+import { FiShoppingBag } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
-const styles = {
-  pdpRoot: {
-    width: '100vw',
-    height: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: '#FFFFFF',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpOuter: {
-    width: 1440,
-    height: 853,
-    background: '#FFFFFF',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpInner: {
-    width: 1002,
-    height: 592,
-    background: '#FFFFFF',
-    marginTop: -80,
-    display: 'flex',
-    boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
-    borderRadius: 4,
-    overflow: 'hidden',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpImagePlaceholder: {
-    width: 610,
-    height: 511,
-    background: '#FFFFFF',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpImagePlaceholderText: {
-    color: '#888',
-    fontSize: 20,
-    fontWeight: 500,
-  },
-  pdpInfo: {
-    flex: 1,
-    padding: '40px 40px 40px 32px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpTitlePlaceholder: {
-    width: '60%',
-    height: 36,
-    background: '#FFFFFF',
-    marginBottom: 16,
-    borderRadius: 4,
-    border: '1px solid #e0e0e0',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpSubtitlePlaceholder: {
-    width: '40%',
-    height: 28,
-    background: '#FFFFFF',
-    marginBottom: 32,
-    borderRadius: 4,
-    border: '1px solid #e0e0e0',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpLabel: {
-    fontWeight: 700,
-    fontSize: 16,
-    marginBottom: 8,
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpSizes: {
-    display: 'flex',
-    gap: 12,
-    marginBottom: 32,
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpSizeBtn: {
-    width: 52,
-    height: 36,
-    border: '1px solid #1D1F22',
-    background: '#FFFFFF',
-    color: '#1D1F22',
-    fontWeight: 400,
-    fontSize: 16,
-    cursor: 'pointer',
-    outline: 'none',
-    transition: 'all 0.15s',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpSizeBtnSelected: {
-    border: '2px solid #1D1F22',
-    background: '#1D1F22',
-    color: '#fff',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpPricePlaceholder: {
-    width: '30%',
-    height: 28,
-    background: '#FFFFFF',
-    marginBottom: 24,
-    borderRadius: 4,
-    border: '1px solid #e0e0e0',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpAddToCart: {
-    display: 'inline-block',
-    width: '100%',
-    height: 52,
-    background: '#5ECE7B',
-    color: '#fff',
-    fontWeight: 600,
-    fontSize: 16,
-    border: 'none',
-    borderRadius: 2,
-    marginBottom: 24,
-    cursor: 'pointer',
-    textAlign: 'center',
-    lineHeight: '52px',
-    textDecoration: 'none',
-    fontFamily: 'Raleway, sans-serif'
-  },
-  pdpDescPlaceholder: {
-    width: '100%',
-    height: 60,
-    background: '#FFFFFF',
-    borderRadius: 4,
-    border: '1px solid #e0e0e0',
-    fontFamily: 'Raleway, sans-serif'
-  },
-};
+export const CategoryContext = createContext();
+export const useCategory = () => useContext(CategoryContext);
 
-const allProducts = [
-  { id: 1, name: "Summer Top", price: 30.00, image: summerTop, 
-    explanation: "Summer Top – Light T-shirt for Summer", 
-    description: "A light and breezy T-shirt designed for hot summer days. Perfect for casual outings and daily wear." },
-  { id: 2, name: "Blue Top With Flower", price: 45.00, image: blueTopFlower, 
-    explanation: "Blue Top With Flower – Floral Women's Top", 
-    description: "A stylish blue top featuring a floral pattern, ideal for spring and summer events." },
-  { id: 3, name: "Black Blouse", price: 75.00, image: blackBlouse, 
-    explanation: "Black Blouse – Elegant Women's Blouse", 
-    description: "An elegant black blouse suitable for both formal and casual occasions." },
-  { id: 4, name: "Green mini skirt", price: 55.00, image: greenSkirt, 
-    explanation: "Green Mini Skirt – Trendy Women's Skirt", 
-    description: "A trendy green mini skirt, perfect for summer days and fashionable looks." },
-  { id: 5, name: "The Cure T-Shirt", price: 45.00, image: CureTShirt, 
-    explanation: "The Cure T-Shirt – Band Merchandise", 
-    description: "Official band T-shirt for The Cure fans. Classic fit, comfortable cotton." },
-  { id: 6, name: "The Cure T-Shirt Black", price: 50.00, image: CureTShirtBlack, 
-    explanation: "The Cure T-Shirt Black – Limited Edition", 
-    description: "Limited edition black T-shirt for The Cure fans, featuring exclusive artwork." },
-  { id: 7, name: "Dark Blue Jeans", price: 95.00, image: DarkBlueJeans, 
-    explanation: "Dark Blue Jeans – Classic Denim", 
-    description: "Durable and stylish dark blue jeans, a timeless addition to any wardrobe." },
-  { id: 8, name: "Light Blue Baggy Jeans", price: 80.00, image: LightBlueBaggyJeans, 
-    explanation: "Light Blue Baggy Jeans – Relaxed Fit", 
-    description: "Baggy light blue jeans for a relaxed, comfortable fit and casual style." },
-  { id: 9, name: "Pink Bag", price: 50.00, image: GirlBag, 
-    explanation: "Pink Bag – Kids' Accessory", 
-    description: "A cute and lightweight pink bag, perfect for kids to carry their essentials." },
-  { id: 10, name: "Hello Kitty Dress", price: 80.00, image: GirlCloth, 
-    explanation: "Hello Kitty Dress – Themed Kids' Dress", 
-    description: "A Hello Kitty themed dress, perfect for young fans and special occasions." },
-  { id: 11, name: "White Converse", price: 130.00, image: GirlShoes, 
-    explanation: "White Converse – Classic Sneakers", 
-    description: "Timeless white Converse sneakers, suitable for all ages and styles." },
-  { id: 12, name: "Red Bag", price: 50.00, image: BoyBag, 
-    explanation: "Red Bag – Boys' Accessory", 
-    description: "A sturdy and practical red bag for boys, ideal for school or outings." },
-  { id: 13, name: "Set For Boys", price: 100.00, image: BoyCloth, 
-    explanation: "Set For Boys – Shirt and Shorts Combo", 
-    description: "A comfortable clothing set for boys, includes a shirt and matching shorts." },
-  { id: 14, name: "Addidas Samba black", price: 150.00, image: BoyShoes, 
-    explanation: "Adidas Samba Black – Iconic Football Shoes", 
-    description: "Iconic Adidas Samba black shoes, designed for football and casual wear." }
-];
+const NavigationBar = () => {
+  const { activeCategory, setActiveCategory, cartItems = [], setCartItems } = useCategory();
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
+  const [currency, setCurrency] = useState('$');
+  const navigate = useNavigate();
 
-const ProductDetailPage = () => {
-  const { id } = useParams();
-  const product = allProducts.find(p => p.id === Number(id));
+  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const [selectedSize, setSelectedSize] = useState('S');
-  const sizes = ['XS', 'S', 'M', 'L'];
-  const images = [product.image, product.image, product.image];
+  const handleCategoryClick = (category) => {
+    setActiveCategory(category);
+  };
 
-  if (!product) {
-    return <div style={{ padding: 40, fontFamily: 'Raleway, sans-serif' }}>Product not found.</div>;
-  }
+  const handleCurrencySelect = (value) => {
+    setCurrency(value);
+    setCurrencyOpen(false);
+  };
+
+  const toggleCurrency = () => {
+    setCurrencyOpen((prev) => !prev);
+    setMiniCartOpen(false);
+  };
+
+  const toggleCart = () => {
+    setMiniCartOpen((prev) => !prev);
+    setCurrencyOpen(false);
+  };
 
   return (
-    <div style={styles.pdpRoot}>
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
+        .nav-header {
+          font-family: 'Raleway', sans-serif !important;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 1440px;
+          height: 80px;
+          padding: 0 52px; /* was 32px, now 20px more on both sides */
+          background: #ffffff;
+          position: relative;
+        }
+        .nav-links {
+          display: flex;
+          gap: 24px;
+          margin-left: 40px; /* move links 20px to the right */
+        }
+        .nav-link {
+          cursor: pointer;
+          padding-bottom: 8px;
+          color: #1d1f22;
+          font-weight: 400;
+        }
+        .nav-link.active {
+          color: #5ece7b;
+          border-bottom: 2px solid #5ece7b;
+        }
+        .logo {
+          font-size: 24px;
+          color: #5ece7b;
+        }
+        .nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          position: relative;
+          margin-right: 40px; /* move actions 20px to the left */
+        }
+        .currency-selector {
+          cursor: pointer;
+          position: relative;
+        }
+        .currency-main {
+          font-size: 1.3em;
+          vertical-align: middle;
+        }
+        .currency-dropdown {
+          position: absolute;
+          top: 65px;
+          left: -25px;
+          width: 114px;
+          height: 169px;
+          background: white;
+          box-shadow: 0px 0px 36px rgba(168, 172, 176, 0.19);
+          backdrop-filter: blur(35px);
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+        }
+        .currency-dropdown div {
+          padding: 18px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        .currency-dropdown div:hover {
+          background: #f0f0f0;
+        }
+        .cart-icon {
+          position: relative;
+          cursor: pointer;
+        }
+        .cart-icon svg {
+          font-size: 1.2em;
+          vertical-align: middle;
+          position: relative;
+          top: 2px;
+        }
+        .cart-count {
+          position: absolute;
+          top: -8px;
+          right: -10px;
+          background: black;
+          color: white;
+          border-radius: 50%;
+          padding: 2px 6px;
+          font-size: 10px;
+        }
+        .mini-cart {
+          position: absolute;
+          top: 78px;
+          left: -220px;
+          width: 240px;
+          background: #ffffff;
+          padding: 18px 10px;
+          box-shadow: 0px 0px 36px rgba(168, 172, 176, 0.19);
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          z-index: 20;
+          font-family: 'Raleway', sans-serif !important;
+          font-size: 13px;
+        }
+        .mini-cart h4 {
+          margin: 0 0 5px 0;
+          text-align: left;
+          font-size: 1.1em;
+          font-weight: normal;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .mini-cart h4 .bag-title {
+          font-weight: bold;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-items {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          font-size: 1em;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-item img {
+          width: 60px;
+          height: auto;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-total {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          width: 100%;
+          font-weight: bold;
+          margin-top: auto;
+          padding-top: 6px;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-total-label {
+          text-align: left;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-total-amount {
+          text-align: right;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-buttons {
+          display: flex;
+          gap: 8px;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .view-bag {
+          border: 1px solid #1d1f22;
+          background: white;
+          padding: 5px 10px;
+          cursor: pointer;
+          font-size: 12px;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .checkout {
+          background: #5ece7b;
+          color: white;
+          border: none;
+          padding: 5px 10px;
+          cursor: pointer;
+          font-size: 12px;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-item-details {
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          font-size: 0.95em;
+          flex: 1;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .item-name {
+          color: #1d1f22;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .item-price {
+          color: #1d1f22;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .item-size-label {
+          margin-top: 3px;
+          font-size: 0.7em;
+          color: #1d1f22;
+          letter-spacing: 1.5px;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .item-size-selector {
+          display: flex;
+          gap: 4px;
+          margin: 0px 0 0px 0;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .size-rect {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          border: 1px solid #1d1f22;
+          background: #fff;
+          color: #1d1f22;
+          font-size: 0.6em;
+          cursor: pointer;
+          text-transform: uppercase;
+          transition: all 0.2s;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .size-rect.selected {
+          background: #1d1f22;
+          color: #fff;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .cart-item-controls {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 18px;
+          margin: 0 2px;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .qty-btn {
+          width: 14px;
+          height: 14px;
+          border: 1px solid #1d1f22;
+          background: #fff;
+          color: #1d1f22;
+          font-size: 0.9em;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s, color 0.2s;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .qty-btn:hover {
+          background: #1d1f22;
+          color: #fff;
+        }
+        .item-qty {
+          font-size: 0.9em;
+          color: #1d1f22;
+          margin: 6px 0;
+          font-family: 'Raleway', sans-serif !important;
+        }
+        .mini-cart-close-btn {
+          position: absolute;
+          top: 6px;
+          right: 10px;
+          background: none;
+          border: none;
+          font-size: 18px;
+          color: #888;
+          cursor: pointer;
+          z-index: 21;
+        }
+        .mini-cart-close-btn:hover {
+          color: #222;
+        }
+        .cart-global-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(57, 55, 72, 0.22);
+          z-index: 10;
+          pointer-events: auto;
+        }
       `}</style>
-      <div style={styles.pdpOuter}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginRight: '16px' }}>
-            {images.map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`Thumbnail ${idx + 1}`}
-                width={79}
-                height={80}
-                style={{ objectFit: 'cover', border: '1px solid #ccc', borderRadius: 2, fontFamily: 'Raleway, sans-serif' }}
-              />
-            ))}
-          </div>
-          <div style={styles.pdpInner}>
-            <div style={styles.pdpImagePlaceholder}>
-              <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', fontFamily: 'Raleway, sans-serif' }} />
-            </div>
-            <div style={styles.pdpInfo}>
-              <h1 style={{ fontWeight: 700, fontSize: 32, margin: 0, fontFamily: 'Raleway, sans-serif' }}>{product.name}</h1>
-              <div style={{ color: '#888', fontSize: 18, margin: '12px 0 24px', fontWeight: 400, fontFamily: 'Raleway, sans-serif', fontStyle: 'normal' }}>{product.explanation}</div>
-              <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start' }}>SIZE:</div>
-              <div style={{ ...styles.pdpSizes, paddingLeft: 0, alignSelf: 'flex-start' }}>
-                {sizes.map(size => (
-                  <button
-                    key={size}
-                    style={
-                      selectedSize === size
-                        ? { ...styles.pdpSizeBtn, ...styles.pdpSizeBtnSelected, fontWeight: 400 }
-                        : { ...styles.pdpSizeBtn, fontWeight: 400 }
-                    }
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-              <div style={{ height: 64 }} />
-              <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start', marginBottom: 0 }}>PRICE:</div>
-              <div style={{ ...styles.pdpPricePlaceholder, fontWeight: 700, border: 'none', paddingLeft: 0, alignSelf: 'flex-start', marginTop: 4 }}>
-                ${product.price.toFixed(2)}
-              </div>
-              <button
-                type="button"
-                style={{ ...styles.pdpAddToCart, fontWeight: 400 }}
-              >
-                ADD TO CART
-              </button>
-              <div style={{ 
-                ...styles.pdpDescPlaceholder, 
-                display: 'flex', 
-                alignItems: 'center', 
-                color: '#444', 
-                fontSize: 16, 
-                fontWeight: 400, 
-                padding: '0 16px',
-                border: 'none',
-                background: '#fff',
-                fontFamily: 'Raleway, sans-serif'
-              }}>
-                {product.description}
-              </div>
-            </div>
-          </div>
+      {miniCartOpen && (
+        <div
+          className="cart-global-overlay"
+          style={{
+            zIndex: 10,
+            pointerEvents: 'auto'
+          }}
+        ></div>
+      )}
+      <header className="nav-header" style={{ position: 'relative', zIndex: 30 }}>
+        <nav className="nav-links">
+          {['WOMEN', 'MEN', 'KIDS'].map((cat) => (
+            <span
+              key={cat}
+              className={`nav-link ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => handleCategoryClick(cat)}
+            >
+              {cat}
+            </span>
+          ))}
+        </nav>
+        <div className="logo">
+          <FiShoppingBag className="green-bag" />
         </div>
-      </div>
-    </div>
+        <div className="nav-actions">
+          <div className="currency-selector" onClick={toggleCurrency}>
+            <span className="currency-main">{currency} <span className="arrow">{currencyOpen ? 'ˆ' : 'ˇ'}</span></span>
+            {currencyOpen && (
+              <div className="currency-dropdown">
+                <div onClick={() => handleCurrencySelect('$')}><span className="currency-symbol">$</span> USD</div>
+                <div onClick={() => handleCurrencySelect('€')}><span className="currency-symbol">€</span> EUR</div>
+                <div onClick={() => handleCurrencySelect('¥')}><span className="currency-symbol">¥</span> JPY</div>
+              </div>
+            )}
+          </div>
+          <div className="cart-icon" onClick={toggleCart}>
+            <FaShoppingCart />
+            <span className="cart-count">{cartItems.length}</span>
+          </div>
+          {miniCartOpen && (
+            <div className="mini-cart">
+              <button
+                className="mini-cart-close-btn"
+                aria-label="Close cart"
+                onClick={() => setMiniCartOpen(false)}
+              >
+                ×
+              </button>
+              {cartItems.length === 0 ? (
+                <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 18 }}>
+                  Your cart is empty.
+                </div>
+              ) : (
+                <>
+                  <h4><span className="bag-title">My Bag,</span> {cartItems.length} items</h4>
+                  <div className="cart-items">
+                    {cartItems.map((item, idx) => (
+                      <div key={idx} className="cart-item">
+                        <div className="cart-item-details">
+                          <div className="item-name">{item.name}</div>
+                          <div className="item-price">${item.price.toFixed(2)}</div>
+                          <div className="item-size-label">SIZE:</div>
+                          <div className="item-size-selector">
+                            {['XS', 'S', 'M', 'L'].map((size) => (
+                              <span
+                                key={size}
+                                className={`size-rect${item.size === size ? ' selected' : ''}`}
+                              >
+                                {size}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="cart-item-controls">
+                          <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx ? { ...ci, quantity: ci.quantity + 1 } : ci))}>+</button>
+                          <div className="item-qty">{item.quantity}</div>
+                          <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx && ci.quantity > 1 ? { ...ci, quantity: ci.quantity - 1 } : ci))}>-</button>
+                        </div>
+                        <img src={item.image} alt={item.name} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="cart-total">
+                    <span className="cart-total-label">Total:</span>
+                    <span className="cart-total-amount">${total.toFixed(2)}</span>
+                  </div>
+                  <div className="cart-buttons">
+                    <button
+                      className="view-bag"
+                      onClick={() => {
+                        setMiniCartOpen(false);
+                        navigate('/cart');
+                      }}
+                    >
+                      VIEW BAG
+                    </button>
+                    <button className="checkout">CHECK OUT</button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+    </>
   );
 };
 
-export default ProductDetailPage;
+export default NavigationBar;
