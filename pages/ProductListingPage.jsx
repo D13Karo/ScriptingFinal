@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import summerTop from './images/SummerTop.jpg'; 
 import blueTopFlower from './images/BlueTop.jpg';
 import blackBlouse from './images/BlackBlouse.jpg';
@@ -31,7 +31,9 @@ const CartIcon = () => (
       maxWidth: '44px',
       maxHeight: '44px',
       boxShadow: '0 2px 8px rgba(76,175,80,0.15)',
+      fontFamily: 'Raleway, sans-serif'
     }}
+    className="raleway-font"
   >
     <CiShoppingCart size={22} color="#fff" style={{display: 'block'}} />
   </span>
@@ -71,15 +73,14 @@ const ProductListingPage = () => {
   ]);
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name);
   const [hoveredProduct, setHoveredProduct] = useState(null);
+  const navigate = useNavigate();
 
   const handleAddToCart = (productId) => {
-    // Add your cart logic here
     console.log(`Added product ${productId} to cart`);
   };
 
   const openProductDetail = (productId) => {
-    // Add navigation to product detail page here
-    console.log(`Opening product detail for ${productId}`);
+    navigate(`/product/${productId}`);
   };
 
   const currentCategory = categories.find(e => e.name === selectedCategory);
@@ -88,6 +89,10 @@ const ProductListingPage = () => {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
+        .raleway-font { font-family: 'Raleway', sans-serif !important; }
+        .product-listing-container, .category-header, .category-title, .products-grid, .product-card, .product-image, .add-to-cart-btn, .product-info, .product-name, .product-price, .out-of-stock-overlay, .category-selector, .category-btn {
+          font-family: 'Raleway', sans-serif !important;
+        }
         .product-listing-container {
           padding: 40px 40px 0 40px;
           background: #fff;
@@ -119,6 +124,7 @@ const ProductListingPage = () => {
           justify-content: center;
           margin-left: auto;
           margin-right: auto;
+          margin-bottom: 80px;
         }
         .product-card {
           background: #fff;
@@ -273,38 +279,35 @@ const ProductListingPage = () => {
           font-weight: bold;
         }
       `}</style>
-      <div className="product-listing-container">
-        {/* Category Selector */}
-        <div className="category-selector">
+      <div className="product-listing-container raleway-font">
+        <div className="category-selector raleway-font">
           {categories.map(e => (
             <button
               key={e.name}
-              className={`category-btn${selectedCategory === e.name ? ' active' : ''}`}
+              className={`category-btn raleway-font${selectedCategory === e.name ? ' active' : ''}`}
               onClick={() => setSelectedCategory(e.name)}
             >
               {e.name}
             </button>
           ))}
         </div>
-
-        {/* Category Title */}
-        <div className="category-header">
-          <h1 className="category-title">{currentCategory.name}</h1>
+        <div className="category-header raleway-font">
+          <h1 className="category-title raleway-font">{currentCategory.name}</h1>
         </div>
-
-        {/* Products Grid */}
-        <div className="products-grid">
+        <div className="products-grid raleway-font">
           {currentCategory.products.map(product => (
             <div 
               key={product.id}
-              className={`product-card${!product.inStock ? ' out-of-stock' : ''}`}
-              onMouseEnter={() => setHoveredProduct(product.id)}
-              onMouseLeave={() => setHoveredProduct(null)}
+              className={`product-card raleway-font${!product.inStock ? ' out-of-stock' : ''}`}
+              onMouseEnter={() => product.inStock && setHoveredProduct(product.id)}
+              onMouseLeave={() => product.inStock && setHoveredProduct(null)}
+              onClick={() => product.inStock && openProductDetail(product.id)}
+              style={{ pointerEvents: product.inStock ? 'auto' : 'none', opacity: product.inStock ? 1 : 0.6 }}
             >
-              <div className="product-image" onClick={() => openProductDetail(product.id)}>
-                <img src={product.image} alt={product.name} />
+              <div className="product-image raleway-font">
+                <img src={product.image} alt={product.name} className="raleway-font" />
                 {!product.inStock && (
-                  <div className="out-of-stock-overlay" style={{
+                  <div className="out-of-stock-overlay raleway-font" style={{
                     position: 'absolute',
                     top: 0, left: 0, right: 0, bottom: 0,
                     background: 'rgba(255,255,255,0.7)',
@@ -320,9 +323,9 @@ const ProductListingPage = () => {
                   </div>
                 )}
                 {hoveredProduct === product.id && product.inStock && (
-                  <div className="add-to-cart-overlay">
+                  <div className="add-to-cart-overlay raleway-font">
                     <button 
-                      className="add-to-cart-btn"
+                      className="add-to-cart-btn raleway-font"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAddToCart(product.id);
@@ -333,9 +336,9 @@ const ProductListingPage = () => {
                   </div>
                 )}
               </div>
-              <div className="product-info" onClick={() => openProductDetail(product.id)}>
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">${product.price.toFixed(2)}</p>
+              <div className="product-info raleway-font">
+                <h3 className="product-name raleway-font">{product.name}</h3>
+                <p className="product-price raleway-font">${product.price.toFixed(2)}</p>
               </div>
             </div>
           ))}
