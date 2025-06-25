@@ -77,10 +77,6 @@ const ProductListingPage = () => {
   const { activeCategory } = useCategory();
   const currentCategory = categories.find(e => e.name === activeCategory) || categories[0];
 
-  const handleAddToCart = (productId) => {
-    console.log(`Added product ${productId} to cart`);
-  };
-
   const openProductDetail = (productId) => {
     navigate(`/product/${productId}`);
   };
@@ -274,7 +270,12 @@ const ProductListingPage = () => {
               style={{ pointerEvents: product.inStock ? 'auto' : 'none', opacity: product.inStock ? 1 : 0.6 }}
             >
               <div className="product-image raleway-font">
-                <img src={product.image} alt={product.name} className="raleway-font" />
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="raleway-font"
+                  onClick={e => e.stopPropagation()} // Prevent image click from bubbling up
+                />
                 {!product.inStock && (
                   <div className="out-of-stock-overlay raleway-font" style={{
                     position: 'absolute',
@@ -297,7 +298,7 @@ const ProductListingPage = () => {
                       className="add-to-cart-btn raleway-font"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAddToCart(product.id);
+                        openProductDetail(product.id); // Open details page instead of add to cart
                       }}
                     >
                       <CartIcon />
