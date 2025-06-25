@@ -1,1 +1,118 @@
 
+import React, { useState } from 'react';
+import { FaShoppingCart } from 'react-icons/fa';
+import { FiShoppingBag } from 'react-icons/fi';
+import './NavigationBar.css'; // external styles
+
+const NavigationBar = () => {
+  const [activeCategory, setActiveCategory] = useState('WOMEN');
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
+  const [currency, setCurrency] = useState('$');
+  const [cartItems, setCartItems] = useState([
+    { name: 'Apollo Running Short', price: 50, quantity: 1, size: 'S', image: '/short.png' },
+    { name: 'Jupiter Wayfarer', price: 75, quantity: 2, size: 'M', image: '/sunglasses.png' }
+  ]);
+
+  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleCategoryClick = (category) => {
+    setActiveCategory(category);
+  };
+
+  const handleCurrencySelect = (value) => {
+    setCurrency(value);
+    setCurrencyOpen(false);
+  };
+
+  const toggleCurrency = () => {
+    setCurrencyOpen((prev) => !prev);
+    setMiniCartOpen(false); // Close mini-cart if open
+  };
+
+  const toggleCart = () => {
+    setMiniCartOpen((prev) => !prev);
+    setCurrencyOpen(false); // Close currency if open
+  };
+
+  return (
+    <header className="nav-header">
+      <nav className="nav-links">
+        {['WOMEN', 'MEN', 'KIDS'].map((cat) => (
+          <span
+            key={cat}
+            className={`nav-link ${activeCategory === cat ? 'active' : ''}`}
+            onClick={() => handleCategoryClick(cat)}
+          >
+            {cat}
+          </span>
+        ))}
+      </nav>
+
+      <div className="logo">
+        <FiShoppingBag className="green-bag" />
+      </div>
+
+      <div className="nav-actions">
+        <div className="currency-selector" onClick={toggleCurrency}>
+          <span className="currency-main">{currency} <span className="arrow">{currencyOpen ? 'ˆ' : 'ˇ'}</span></span>
+          {currencyOpen && (
+            <div className="currency-dropdown">
+              <div onClick={() => handleCurrencySelect('$')}><span className="currency-symbol">$</span> USD</div>
+              <div onClick={() => handleCurrencySelect('€')}><span className="currency-symbol">€</span> EUR</div>
+              <div onClick={() => handleCurrencySelect('¥')}><span className="currency-symbol">¥</span> JPY</div>
+            </div>
+          )}
+        </div>
+
+        <div className="cart-icon" onClick={toggleCart}>
+          <FaShoppingCart />
+          <span className="cart-count">{cartItems.length}</span>
+        </div>
+
+        {miniCartOpen && (
+          <div className="mini-cart">
+            <h4><span className="bag-title">My Bag,</span> {cartItems.length} items</h4>
+            <div className="cart-items">
+              {cartItems.map((item, idx) => (
+                <div key={idx} className="cart-item">
+                  <div className="cart-item-details">
+                    <div className="item-name">{item.name}</div>
+                    <div className="item-price">${item.price.toFixed(2)}</div>
+                    <div className="item-size-label">SIZE:</div>
+                    <div className="item-size-selector">
+                      {['XS', 'S', 'M', 'L'].map((size) => (
+                        <span
+                          key={size}
+                          className={`size-rect${item.size === size ? ' selected' : ''}`}
+                        >
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="cart-item-controls">
+                    <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx ? { ...ci, quantity: ci.quantity + 1 } : ci))}>+</button>
+                    <div className="item-qty">{item.quantity}</div>
+                    <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx && ci.quantity > 1 ? { ...ci, quantity: ci.quantity - 1 } : ci))}>-</button>
+                  </div>
+                  <img src={item.image} alt={item.name} />
+                </div>
+              ))}
+            </div>
+            <div className="cart-total">
+              <span className="cart-total-label">Total:</span>
+              <span className="cart-total-amount">${total.toFixed(2)}</span>
+            </div>
+            <div className="cart-buttons">
+              <button className="view-bag">VIEW BAG</button>
+              <button className="checkout">CHECK OUT</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default NavigationBar;
