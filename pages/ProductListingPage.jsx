@@ -15,6 +15,7 @@ import BoyBag from './images/BoyBag.jpg';
 import BoyCloth from './images/BoyCloth.jpg';
 import BoyShoes from './images/BoyShoes.jpg';
 import { CiShoppingCart } from "react-icons/ci";
+import { useCategory } from './NavigationBar.jsx';
 
 const CartIcon = () => (
   <span
@@ -71,9 +72,10 @@ const ProductListingPage = () => {
       ]
     }
   ]);
-  const [selectedCategory, setSelectedCategory] = useState(categories[0].name);
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const navigate = useNavigate();
+  const { activeCategory } = useCategory();
+  const currentCategory = categories.find(e => e.name === activeCategory) || categories[0];
 
   const handleAddToCart = (productId) => {
     console.log(`Added product ${productId} to cart`);
@@ -82,8 +84,6 @@ const ProductListingPage = () => {
   const openProductDetail = (productId) => {
     navigate(`/product/${productId}`);
   };
-
-  const currentCategory = categories.find(e => e.name === selectedCategory);
 
   return (
     <>
@@ -258,39 +258,8 @@ const ProductListingPage = () => {
           z-index: 2;
           pointer-events: none;
         }
-        .category-selector {
-          margin-bottom: 16px;
-        }
-        .category-btn {
-          margin-right: 8px;
-          font-weight: 400;
-          font-size: 18px;
-          background: none;
-          border: none;
-          color: #1D1F22;
-          cursor: pointer;
-          padding: 8px 16px;
-          border-radius: 4px;
-          transition: background 0.2s, color 0.2s;
-        }
-        .category-btn.active, .category-btn:hover {
-          background: #f0f0f0;
-          color: #4caf50;
-          font-weight: bold;
-        }
       `}</style>
       <div className="product-listing-container raleway-font">
-        <div className="category-selector raleway-font">
-          {categories.map(e => (
-            <button
-              key={e.name}
-              className={`category-btn raleway-font${selectedCategory === e.name ? ' active' : ''}`}
-              onClick={() => setSelectedCategory(e.name)}
-            >
-              {e.name}
-            </button>
-          ))}
-        </div>
         <div className="category-header raleway-font">
           <h1 className="category-title raleway-font">{currentCategory.name}</h1>
         </div>
