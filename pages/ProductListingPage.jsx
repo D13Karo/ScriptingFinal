@@ -16,6 +16,10 @@ import BoyCloth from './images/BoyCloth.jpg';
 import BoyShoes from './images/BoyShoes.jpg';
 import { CiShoppingCart } from "react-icons/ci";
 import { useCategory } from './NavigationBar.jsx';
+import GreenDress from './images/GreenDress.jpg';
+import RedDress from './images/RedDress.jpg';
+import MenBlackJeans from './images/MenBlackJeans.jpg';
+import MenBlackShirt from './images/MenBlackShirt.jpg';
 
 const CartIcon = () => (
   <span
@@ -48,7 +52,9 @@ const ProductListingPage = () => {
         { id: 1, name: "T-Shirt", price: 30.00, image: summerTop, inStock: true },
         { id: 2, name: "Blue Top", price: 45.00, image: blueTopFlower, inStock: false },
         { id: 3, name: "Blouse", price: 75.00, image: blackBlouse, inStock: true },
-        { id: 4, name: "Mini Skirt", price: 55.00, image: greenSkirt, inStock: true }
+        { id: 4, name: "Mini Skirt", price: 55.00, image: greenSkirt, inStock: true },
+        { id: 15, name: "Vintage Green Slip Dress", price: 60.00, image: GreenDress, inStock: true },
+        { id: 16, name: "Crimson Nightfall Dress", price: 65.00, image: RedDress, inStock: true }
       ]
     },
     {
@@ -58,6 +64,8 @@ const ProductListingPage = () => {
         { id: 6, name: "Black T-Shirt", price: 50.00, image: CureTShirtBlack, inStock: true },
         { id: 7, name: "Jeans", price: 95.00, image: DarkBlueJeans, inStock: false },
         { id: 8, name: "Baggy Jeans", price: 80.00, image: LightBlueBaggyJeans, inStock: true },
+        { id: 17, name: "Slim Jeans – Washed Black", price: 120.00, image: MenBlackJeans, inStock: true },
+        { id: 18, name: "Obsidian Classic Shirt – Next", price: 70.00, image: MenBlackShirt, inStock: true }
       ]
     },
     {
@@ -74,8 +82,14 @@ const ProductListingPage = () => {
   ]);
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const navigate = useNavigate();
-  const { activeCategory } = useCategory();
+  const { activeCategory, currency } = useCategory();
   const currentCategory = categories.find(e => e.name === activeCategory) || categories[0];
+
+
+  const currencySymbols = { USD: '$', EUR: '€', JPY: '¥' };
+  const rates = { USD: 1, EUR: 0.92, JPY: 155 };
+  const getSymbol = (cur) => currencySymbols[cur] || '$';
+  const getConverted = (price) => (price * (rates[currency] || 1));
 
   const openProductDetail = (productId) => {
     navigate(`/product/${productId}`);
@@ -101,8 +115,8 @@ const ProductListingPage = () => {
           width: 299px;
           height: 68px;
           position: relative;
-          top: 0;
-          left: 76px;
+          top: -30px;
+          left: 90px;
           font-family: 'Raleway', sans-serif;
           font-weight: 400;
           font-size: 42px;
@@ -136,7 +150,6 @@ const ProductListingPage = () => {
           height: 444px;
           position: relative;
           top: 30px;
-          left: 0;
         }
         .product-card:hover {
           box-shadow: 0 4px 16px rgba(255,60,172,0.12);
@@ -305,7 +318,7 @@ const ProductListingPage = () => {
               </div>
               <div className="product-info raleway-font">
                 <h3 className="product-name raleway-font">{product.name}</h3>
-                <p className="product-price raleway-font">${product.price.toFixed(2)}</p>
+                <p className="product-price raleway-font">{getSymbol(currency)}{getConverted(product.price).toFixed(2)}</p>
               </div>
             </div>
           ))}
