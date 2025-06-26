@@ -5,7 +5,6 @@ import NavigationBar, { CategoryContext } from './NavigationBar.jsx';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import React, { useState } from 'react';
 import CartPage from './CartPage.jsx';
-import ShippingMethodPage from './ShippingMethodPage.jsx';
 
 const CategoryProvider = ({ children }) => {
   const location = useLocation();
@@ -16,8 +15,9 @@ const CategoryProvider = ({ children }) => {
     return 'WOMEN';
   });
 
- 
   const [cartItems, setCartItems] = useState([]); 
+
+  const [currency, setCurrency] = useState('USD');
 
   const handleSetCategory = (cat) => {
     setActiveCategory(cat);
@@ -30,7 +30,9 @@ const CategoryProvider = ({ children }) => {
       activeCategory,
       setActiveCategory: handleSetCategory,
       cartItems,
-      setCartItems
+      setCartItems,
+      currency,
+      setCurrency
     }}>
       {children}
     </CategoryContext.Provider>
