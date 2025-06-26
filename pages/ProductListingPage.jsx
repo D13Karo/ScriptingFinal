@@ -45,30 +45,30 @@ const ProductListingPage = () => {
     {
       name: "WOMEN",
       products: [
-        { id: 1, name: "Summer Top", price: 30.00, image: summerTop, inStock: true },
-        { id: 2, name: "Blue Top With Flower", price: 45.00, image: blueTopFlower, inStock: false },
-        { id: 3, name: "Black Blouse", price: 75.00, image: blackBlouse, inStock: true },
-        { id: 4, name: "Green mini skirt", price: 55.00, image: greenSkirt, inStock: true }
+        { id: 1, name: "T-Shirt", price: 30.00, image: summerTop, inStock: true },
+        { id: 2, name: "Blue Top", price: 45.00, image: blueTopFlower, inStock: false },
+        { id: 3, name: "Blouse", price: 75.00, image: blackBlouse, inStock: true },
+        { id: 4, name: "Mini Skirt", price: 55.00, image: greenSkirt, inStock: true }
       ]
     },
     {
       name: "MEN",
       products: [
-        { id: 5, name: "The Cure T-Shirt", price: 45.00, image: CureTShirt, inStock: true },
-        { id: 6, name: "The Cure T-Shirt Black", price: 50.00, image: CureTShirtBlack, inStock: true },
-        { id: 7, name: "Dark Blue Jeans", price: 95.00, image: DarkBlueJeans, inStock: false },
-        { id: 8, name: "Light Blue Baggy Jeans", price: 80.00, image: LightBlueBaggyJeans, inStock: true },
+        { id: 5, name: "Band T-Shirt", price: 45.00, image: CureTShirt, inStock: true },
+        { id: 6, name: "Black T-Shirt", price: 50.00, image: CureTShirtBlack, inStock: true },
+        { id: 7, name: "Jeans", price: 95.00, image: DarkBlueJeans, inStock: false },
+        { id: 8, name: "Baggy Jeans", price: 80.00, image: LightBlueBaggyJeans, inStock: true },
       ]
     },
     {
       name: "KIDS",
       products: [
-        { id: 9, name: "Pink Bag", price: 50.00, image: GirlBag, inStock: true },
-        { id: 10, name: "Hello Kitty Dress", price: 80.00, image: GirlCloth, inStock: true },
-        { id: 11, name: "White Converse", price: 130.00, image: GirlShoes, inStock: false },
+        { id: 9, name: "Bag", price: 50.00, image: GirlBag, inStock: true },
+        { id: 10, name: "Dress", price: 80.00, image: GirlCloth, inStock: true },
+        { id: 11, name: "Sneakers", price: 130.00, image: GirlShoes, inStock: false },
         { id: 12, name: "Red Bag", price: 50.00, image: BoyBag, inStock: true },
-        { id: 13, name: "Set For Boys", price: 100.00, image: BoyCloth, inStock: true },
-        { id: 14, name: "Addidas Samba black", price: 150.00, image: BoyShoes, inStock: true }        
+        { id: 13, name: "Boys Set", price: 100.00, image: BoyCloth, inStock: true },
+        { id: 14, name: "Black Sneakers", price: 150.00, image: BoyShoes, inStock: true }        
       ]
     }
   ]);
@@ -104,11 +104,10 @@ const ProductListingPage = () => {
           top: 0;
           left: 76px;
           font-family: 'Raleway', sans-serif;
-          font-weight: 300;
+          font-weight: 400;
           font-size: 42px;
           line-height: 160%;
           letter-spacing: 0;
-          vertical-align: middle;
           color: #1D1F22;
           margin-bottom: 8px;
           text-align: left;
@@ -157,7 +156,7 @@ const ProductListingPage = () => {
         .product-image img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           transition: transform 0.3s;
         }
         .product-card:hover .product-image img {
@@ -221,7 +220,6 @@ const ProductListingPage = () => {
           background: transparent;
           display: flex;
           align-items: center;
-          vertical-align: middle;
           padding: 0 8px;
           box-sizing: border-box;
         }
@@ -230,14 +228,13 @@ const ProductListingPage = () => {
           width: 58px;
           height: 29px;
           font-size: 18px;
-          font-weight: 400;
+          font-weight: bold;
           font-family: 'Raleway';
           line-height: 160%;
           letter-spacing: 0;
           color: #222;
           display: flex;
           align-items: center;
-          vertical-align: middle;
           background: transparent;
           padding-left: 8px;
         }
@@ -274,7 +271,7 @@ const ProductListingPage = () => {
                   src={product.image}
                   alt={product.name}
                   className="raleway-font"
-                  onClick={e => e.stopPropagation()} // Prevent image click from bubbling up
+                  onClick={e => e.stopPropagation()}
                 />
                 {!product.inStock && (
                   <div className="out-of-stock-overlay raleway-font" style={{
@@ -298,7 +295,7 @@ const ProductListingPage = () => {
                       className="add-to-cart-btn raleway-font"
                       onClick={(e) => {
                         e.stopPropagation();
-                        openProductDetail(product.id); // Open details page instead of add to cart
+                        openProductDetail(product.id); 
                       }}
                     >
                       <CartIcon />
