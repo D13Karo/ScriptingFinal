@@ -7,13 +7,17 @@ export const CategoryContext = createContext();
 export const useCategory = () => useContext(CategoryContext);
 
 const NavigationBar = () => {
-  const { activeCategory, setActiveCategory, cartItems = [], setCartItems } = useCategory();
+  const { activeCategory, setActiveCategory, cartItems = [], setCartItems, currency, setCurrency } = useCategory();
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
-  const [currency, setCurrency] = useState('$');
   const navigate = useNavigate();
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const currencySymbols = { USD: '$', EUR: '€', JPY: '¥' };
+  const rates = { USD: 1, EUR: 0.92, JPY: 155 };
+  const getSymbol = (cur) => currencySymbols[cur] || '$';
+  const getConverted = (price) => (price * (rates[currency] || 1));
+
+  const total = cartItems.reduce((sum, item) => sum + getConverted(item.price) * item.quantity, 0);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCategoryClick = (category) => {
@@ -85,7 +89,7 @@ const NavigationBar = () => {
         }
         .currency-dropdown {
           position: absolute;
-          top: 65px;
+          top: 30px;
           left: -25px;
           width: 114px;
           height: 169px;
@@ -95,11 +99,22 @@ const NavigationBar = () => {
           z-index: 10;
           display: flex;
           flex-direction: column;
+          justify-content: center;
         }
         .currency-dropdown div {
-          padding: 18px;
+          font-family: 'Raleway', sans-serif !important;
+          font-weight: 400;
+          font-size: 18px;
+          line-height: 160%;
+          letter-spacing: 0;
+          text-align: center;
+          width: 114px;
+          height: 45px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
           cursor: pointer;
-          font-size: 14px;
         }
         .currency-dropdown div:hover {
           background: #f0f0f0;
@@ -419,12 +434,12 @@ const NavigationBar = () => {
         </div>
         <div className="nav-actions">
           <div className="currency-selector" onClick={toggleCurrency}>
-            <span className="currency-main">{currency} <span className="arrow">{currencyOpen ? 'ˆ' : 'ˇ'}</span></span>
+            <span className="currency-main">{getSymbol(currency)} <span className="arrow">{currencyOpen ? 'ˆ' : 'ˇ'}</span></span>
             {currencyOpen && (
               <div className="currency-dropdown">
-                <div onClick={() => handleCurrencySelect('$')}><span className="currency-symbol">$</span> USD</div>
-                <div onClick={() => handleCurrencySelect('€')}><span className="currency-symbol">€</span> EUR</div>
-                <div onClick={() => handleCurrencySelect('¥')}><span className="currency-symbol">¥</span> JPY</div>
+                <div onClick={() => handleCurrencySelect('USD')}><span className="currency-symbol">$</span>&nbsp;USD</div>
+                <div onClick={() => handleCurrencySelect('EUR')}><span className="currency-symbol">€</span>&nbsp;EUR</div>
+                <div onClick={() => handleCurrencySelect('JPY')}><span className="currency-symbol">¥</span>&nbsp;JPY</div>
               </div>
             )}
           </div>
@@ -449,7 +464,7 @@ const NavigationBar = () => {
                         <div key={idx} className="cart-item">
                           <div className="cart-item-details">
                             <div className="item-name">{item.name}</div>
-                            <span className="item-price">${item.price.toFixed(2)}</span>
+                            <span className="item-price">{getSymbol(currency)}{getConverted(item.price).toFixed(2)}</span>
                             <div className="item-size-label">Size:</div>
                             <div className="item-size-selector">
                               {['XS', 'S', 'M', 'L'].map((size) => (
@@ -483,7 +498,7 @@ const NavigationBar = () => {
               {cartItems.length > 0 && (
                 <div className="cart-total">
                   <span className="cart-total-label">Total:</span>
-                  <span className="cart-total-amount">${total.toFixed(2)}</span>
+                  <span className="cart-total-amount">{getSymbol(currency)}{total.toFixed(2)}</span>
                 </div>
               )}
               <div className="cart-buttons">
