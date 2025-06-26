@@ -16,8 +16,9 @@ const CategoryProvider = ({ children }) => {
     return 'WOMEN';
   });
 
- 
   const [cartItems, setCartItems] = useState([]); 
+
+  const [currency, setCurrency] = useState('USD');
 
   const handleSetCategory = (cat) => {
     setActiveCategory(cat);
@@ -30,7 +31,9 @@ const CategoryProvider = ({ children }) => {
       activeCategory,
       setActiveCategory: handleSetCategory,
       cartItems,
-      setCartItems
+      setCartItems,
+      currency,
+      setCurrency
     }}>
       {children}
     </CategoryContext.Provider>

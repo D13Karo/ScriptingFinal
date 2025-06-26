@@ -14,6 +14,10 @@ import GirlShoes from './images/GirlShoes.jpg';
 import BoyBag from './images/BoyBag.jpg';
 import BoyCloth from './images/BoyCloth.jpg';
 import BoyShoes from './images/BoyShoes.jpg';
+import GreenDress from './images/GreenDress.jpg';
+import RedDress from './images/RedDress.jpg';
+import MenBlackJeans from './images/MenBlackJeans.jpg';
+import MenBlackShirt from './images/MenBlackShirt.jpg';
 import { useCategory } from './NavigationBar.jsx';
 
 const styles = {
@@ -195,14 +199,32 @@ const allProducts = [
     description: "A comfortable clothing set for boys, includes a shirt and matching shorts." },
   { id: 14, name: "Addidas Samba black", price: 150.00, image: BoyShoes, 
     explanation: "Iconic Football Shoes", 
-    description: "Iconic Adidas Samba black shoes, designed for football and casual wear." }
+    description: "Iconic Adidas Samba black shoes, designed for football and casual wear." },
+  { id: 15, name: "Vintage Green Slip Dress", price: 60.00, image: GreenDress, 
+    explanation: "A delicate, ethereal slip dress in shades of moss and sage green, adorned with a subtle floral print.", 
+    description: " Its lightweight, pleated fabric flows effortlessly, mimicking the gentle sway of wildflowers in a summer breeze.perfect for golden hour strolls or dreamy garden parties." },
+  { id: 16, name: "Crimson Nightfall Dress", price: 65.00, image: RedDress, 
+    explanation: "A gothic-style dress with velvet floral patterns and dramatic bell sleevess", 
+    description: "A deep burgundy dress with black velvet florals, sheer bell sleeves, and a tied open back. Elegant and bold—perfect for evening or alternative looks." },
+  { id: 17, name: "Slim Jeans – Washed Black", price: 120.00, image: MenBlackJeans, 
+    explanation: "Slim fit, washed black designer jeans for a modern look.", 
+    description: "Premium denim jeans from rag & bone, featuring a slim fit and a washed black finish. Stylish, comfortable, and versatile for any occasion." },
+  { id: 18, name: "Obsidian Classic Shirt – Next", price: 70.00, image: MenBlackShirt, 
+    explanation: "Classic black shirt with a modern tailored fit.",
+    description: "A timeless black shirt from Next, tailored for a classic yet contemporary look. Perfect for both formal and casual wear." }
 ];
 
 
 const ProductDetailPage = () => {
   const { id } = useParams();
   const product = allProducts.find(p => p.id === Number(id));
-  const { setCartItems } = useCategory();
+  const { setCartItems, currency } = useCategory();
+
+  
+  const currencySymbols = { USD: '$', EUR: '€', JPY: '¥' };
+  const rates = { USD: 1, EUR: 0.92, JPY: 155 };
+  const getSymbol = (cur) => currencySymbols[cur] || '$';
+  const getConverted = (price) => (price * (rates[currency] || 1));
 
   const [selectedSize, setSelectedSize] = useState('S');
   const sizes = ['XS', 'S', 'M', 'L'];
@@ -305,7 +327,7 @@ const ProductDetailPage = () => {
               <div style={{ height: 64 }} />
               <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start', marginBottom: 0 }}>PRICE:</div>
               <div style={{ ...styles.pdpPricePlaceholder, fontWeight: 700, border: 'none', paddingLeft: 0, alignSelf: 'flex-start', marginTop: 4 }}>
-                ${product.price.toFixed(2)}
+                {getSymbol(currency)}{getConverted(product.price).toFixed(2)}
               </div>
               <button
                 type="button"
