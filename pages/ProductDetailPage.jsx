@@ -212,24 +212,20 @@ const ProductDetailPage = () => {
     return <div style={{ padding: 40, fontFamily: 'Raleway, sans-serif' }}>Product not found.</div>;
   }
 
-  // Add to cart handler
+  
   const handleAddToCart = () => {
-    if (!setCartItems) return; // Defensive: ensure setCartItems exists
+    if (!setCartItems) return;
 
     setCartItems(prevCart => {
-      // Always treat prevCart as an array
       const cart = Array.isArray(prevCart) ? prevCart : [];
-      // Find if item with same id and size exists
       const idx = cart.findIndex(
         (item) => item.id === product.id && item.size === selectedSize
       );
       if (idx !== -1) {
-        // Increase quantity if exists
         return cart.map((item, i) =>
           i === idx ? { ...item, quantity: item.quantity + 1 } : item
         );
       } else {
-        // Add new item
         return [
   ...cart,
   {
@@ -262,7 +258,7 @@ const ProductDetailPage = () => {
                 alt={`Thumbnail ${idx + 1}`}
                 width={79}
                 height={80}
-                style={{ objectFit: 'cover', border: '1px solid #ccc', borderRadius: 2, fontFamily: 'Raleway, sans-serif' }}
+                style={{ objectFit: 'contain', borderRadius: 2, fontFamily: 'Raleway, sans-serif' }}
               />
             ))}
           </div>
@@ -271,8 +267,25 @@ const ProductDetailPage = () => {
               <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', fontFamily: 'Raleway, sans-serif' }} />
             </div>
             <div style={styles.pdpInfo}>
-              <h1 style={{ fontWeight: 700, fontSize: 32, margin: 0, fontFamily: 'Raleway, sans-serif' }}>{product.name}</h1>
-              <div style={{ color: '#888', fontSize: 18, margin: '12px 0 24px', fontWeight: 400, fontFamily: 'Raleway, sans-serif', fontStyle: 'normal' }}>{product.explanation}</div>
+              <h1 style={{
+                fontFamily: 'Source Sans Pro, sans-serif',
+                fontWeight: 400,
+                fontSize: 16,
+                lineHeight: '18px',
+                letterSpacing: '5%',
+                textAlign: 'left',
+                margin: 0,
+                marginBottom: 8
+              }}>{product.name}</h1>
+              <div style={{
+                color: '#888',
+                fontSize: 18,
+                margin: '0 0 40px 0',
+                fontWeight: 400,
+                fontFamily: 'Raleway, sans-serif',
+                fontStyle: 'normal',
+                textAlign: 'left'
+              }}>{product.explanation}</div>
               <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start' }}>SIZE:</div>
               <div style={{ ...styles.pdpSizes, paddingLeft: 0, alignSelf: 'flex-start' }}>
                 {sizes.map(size => (
