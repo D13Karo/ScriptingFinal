@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useCategory } from './NavigationBar';
 
@@ -9,11 +8,12 @@ const CartPage = () => {
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleQtyChange = (idx, delta) => {
-    setCartItems(cartItems.map((ci, i) =>
-      i === idx
-        ? { ...ci, quantity: Math.max(1, ci.quantity + delta) }
-        : ci
-    ));
+    setCartItems(prev => {
+      const updated = prev.map((ci, i) =>
+        i === idx ? { ...ci, quantity: ci.quantity + delta } : ci
+      );
+      return updated.filter(ci => ci.quantity > 0);
+    });
   };
 
   return (
@@ -21,16 +21,16 @@ const CartPage = () => {
       <style>{`
         .cart-main {
           font-family: 'Raleway', sans-serif !important;
-          max-width: 900px;
           width: 100%;
-          margin: 40px auto 0 auto;
-          padding: 0 0 32px 0;
+          margin: 40px 0 0 0;
+          padding: 0 80px 120px 80px;
         }
         .cart-title {
           font-weight: 700;
           font-size: 22px;
           margin-bottom: 32px;
           letter-spacing: 0.5px;
+          text-align: left;
         }
         .cart-divider {
           border-top: 1px solid #e5e5e5;
@@ -41,12 +41,13 @@ const CartPage = () => {
           align-items: flex-start;
           border-bottom: 1px solid #e5e5e5;
           padding: 28px 0 18px 0;
-          justify-content: center;
+          justify-content: flex-start;
         }
         .cart-item-details-main {
           flex: 2;
           min-width: 0;
-          margin-left: -180px;
+          margin-left: 0;
+          margin-right: 24px;
           display: flex;
           flex-direction: column;
           align-items: flex-start;
@@ -62,6 +63,7 @@ const CartPage = () => {
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
+          text-align: left;
         }
         .cart-item-desc {
           color: #1d1f22;
@@ -117,7 +119,7 @@ const CartPage = () => {
           flex-direction: column;
           align-items: center;
           margin: 0 24px;
-          gap: 100px; /* Make space between +, number, and - smaller */
+          gap: 100px; 
         }
         .cart-qty-btn {
           width: 45px;
@@ -154,12 +156,14 @@ const CartPage = () => {
           align-items: center;
           justify-content: center;
           position: relative;
+          margin-left: auto;
         }
         .cart-item-image img {
           width: 200px;
           height: 288px;
           border-radius: 2px;
-          object-fit: cover;
+          object-fit: contain;
+          background: #f8f8f8;
         }
         .cart-image-arrows {
           position: absolute;
@@ -190,13 +194,19 @@ const CartPage = () => {
         }
         .cart-summary-row {
           display: flex;
-          justify-content: space-between;
+          flex-direction: column;
+          align-items: flex-start;
           margin-top: 32px;
-          align-items: flex-end;
+          gap: 0;
         }
         .cart-summary-labels {
-          font-size: 15px;
-          color: #1d1f22;
+          flex-direction: column;
+          gap: 0;
+        }
+        .cart-summary-label-row {
+          display: block;
+          margin-bottom: 4px;
+          text-align: left;
         }
         .cart-summary-labels b {
           font-size: 16px;
@@ -207,7 +217,8 @@ const CartPage = () => {
           background: #5ece7b;
           color: #fff;
           border: none;
-          padding: 8px 36px;
+          width: 279px;
+          height: 43px;
           font-weight: 600;
           font-size: 13px;
           border-radius: 0;
@@ -215,20 +226,24 @@ const CartPage = () => {
           font-family: 'Raleway', sans-serif !important;
           margin-top: 10px;
           letter-spacing: 0.5px;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       `}</style>
       <div className="cart-main">
-        <h2 className="cart-title">CART</h2>
+        <h2 className="cart-title" style={{marginLeft: 0, paddingLeft: 0}}>CART</h2>
         <div className="cart-divider"></div>
         {cartItems.length === 0 ? (
           <div style={{ color: '#888', fontSize: 20, textAlign: 'center', margin: 80 }}>Your cart is empty.</div>
         ) : (
           cartItems.map((item, idx) => (
             <div key={idx} className="cart-item-row">
-              <div className="cart-item-details-main">
-                <div className="cart-item-name">{item.name}</div>
-                    {item.description && (
-                <div className="cart-item-desc">{item.description}</div>
+              <div className="cart-item-details-main" style={{marginLeft: 0, paddingLeft: 0, alignItems: 'flex-start'}}>
+                <div className="cart-item-name" style={{marginLeft: 0, paddingLeft: 0}}>{item.name}</div>
+                {item.description && (
+                  <div className="cart-item-desc">{item.description}</div>
                 )}
                 <div className="cart-item-price">${item.price.toFixed(2)}</div>
                 <div className="cart-size-label">SIZE:</div>
@@ -265,9 +280,13 @@ const CartPage = () => {
           ))
         )}
         <div className="cart-summary-row">
-          <div className="cart-summary-labels">
-            <div>Quantity: <b>{totalQuantity}</b></div>
-            <div>Total: <b>${totalPrice.toFixed(2)}</b></div>
+          <div className="cart-summary-labels" style={{marginBottom: '16px'}}>
+            <div className="cart-summary-label-row">
+              <span>Quantity: <b>{totalQuantity}</b></span>
+            </div>
+            <div className="cart-summary-label-row">
+              <span>Total: <b>${totalPrice.toFixed(2)}</b></span>
+            </div>
           </div>
           <button className="cart-continue-btn">
             CONTINUE
