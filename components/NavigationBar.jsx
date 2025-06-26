@@ -14,6 +14,7 @@ const NavigationBar = () => {
   const navigate = useNavigate();
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
@@ -44,14 +45,14 @@ const NavigationBar = () => {
           align-items: center;
           width: 1440px;
           height: 80px;
-          padding: 0 52px; /* was 32px, now 20px more on both sides */
+          padding: 0 52px;
           background: #ffffff;
           position: relative;
         }
         .nav-links {
           display: flex;
           gap: 24px;
-          margin-left: 40px; /* move links 20px to the right */
+          margin-left: 40px;
         }
         .nav-link {
           cursor: pointer;
@@ -72,7 +73,7 @@ const NavigationBar = () => {
           align-items: center;
           gap: 20px;
           position: relative;
-          margin-right: 40px; /* move actions 20px to the left */
+          margin-right: 40px;
         }
         .currency-selector {
           cursor: pointer;
@@ -125,18 +126,33 @@ const NavigationBar = () => {
         }
         .mini-cart {
           position: absolute;
-          top: 78px;
-          left: -220px;
-          width: 240px;
+          top: 30px;
+          left: 50%;
+          transform: translateX(-80%);
+          width: 325px;
+          height: 625px;
           background: #ffffff;
-          padding: 18px 10px;
+          padding: 32px 16px 32px 16px;
           box-shadow: 0px 0px 36px rgba(168, 172, 176, 0.19);
           display: flex;
           flex-direction: column;
-          gap: 18px;
+          gap: 32px;
           z-index: 20;
           font-family: 'Raleway', sans-serif !important;
           font-size: 13px;
+        }
+        .mini-cart-inner {
+          width: 293px;
+          height: 486px;
+          display: flex;
+          flex-direction: column;
+          gap: 32px;
+          margin: -12px auto 0 auto;
+          flex: 1 1 auto;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding-right: 20px;
+          box-sizing: content-box;
         }
         .mini-cart h4 {
           margin: 0 0 5px 0;
@@ -158,25 +174,32 @@ const NavigationBar = () => {
         }
         .cart-item {
           display: flex;
+          flex-direction: row;
+          width: 293px;
+          height: 162px;
           justify-content: space-between;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
           font-family: 'Raleway', sans-serif !important;
         }
         .cart-item img {
-          width: 60px;
-          height: auto;
+          width: 121px;
+          height: 162px;
+          object-fit: cover;
           font-family: 'Raleway', sans-serif !important;
         }
         .cart-total {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          width: 100%;
+          width: 289px;
+          height: 28px;
           font-weight: bold;
           margin-top: auto;
           padding-top: 6px;
           font-family: 'Raleway', sans-serif !important;
+          margin-left: auto;
+          margin-right: auto;
         }
         .cart-total-label {
           text-align: left;
@@ -188,66 +211,118 @@ const NavigationBar = () => {
         }
         .cart-buttons {
           display: flex;
-          gap: 8px;
+          gap: 12px;
+          width: 292px;
+          height: 43px;
           font-family: 'Raleway', sans-serif !important;
+          margin-top: auto;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .view-bag, .checkout {
+          width: 140px;
+          height: 43px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 500;
+          font-family: 'Raleway', sans-serif !important;
+          text-align: center;
+          line-height: 43px;
+          padding: 0;
+          text-transform: none;
         }
         .view-bag {
           border: 1px solid #1d1f22;
-          background: white;
-          padding: 5px 10px;
-          cursor: pointer;
-          font-size: 12px;
+          background: #fff;
+          color: #1d1f22;
+          font-weight: 500;
+          font-size: 16px;
           font-family: 'Raleway', sans-serif !important;
+          cursor: pointer;
+          box-shadow: none;
+          text-transform: none;
         }
         .checkout {
           background: #5ece7b;
-          color: white;
+          color: #fff;
           border: none;
-          padding: 5px 10px;
-          cursor: pointer;
-          font-size: 12px;
+          font-weight: 500;
+          font-size: 16px;
           font-family: 'Raleway', sans-serif !important;
+          cursor: pointer;
+          box-shadow: none;
+          text-transform: none;
         }
         .cart-item-details {
-          text-align: left;
+          width: 136px;
+          height: 162px;
           display: flex;
           flex-direction: column;
-          gap: 2px;
-          font-size: 0.95em;
-          flex: 1;
+          gap: 4px;
+          text-align: left;
+          font-size: 16px;
+          line-height: 1.6;
+          font-weight: 400;
+          letter-spacing: 0px;
+          align-items: center;
           font-family: 'Raleway', sans-serif !important;
         }
         .item-name {
           color: #1d1f22;
           font-family: 'Raleway', sans-serif !important;
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 1.6;
+          text-align: left;
+          letter-spacing: 0px;
+          margin: 0;
         }
         .item-price {
           color: #1d1f22;
           font-family: 'Raleway', sans-serif !important;
+          font-size: 16px;
+          font-weight: bold;
+          line-height: 1.6;
+          letter-spacing: 0px;
+          align-self: flex-start;
+          margin-top: 0;
+          width: 289px;
+          height: 28px;
+          margin-left: auto;
+          margin-right: auto;
         }
         .item-size-label {
-          margin-top: 3px;
-          font-size: 0.7em;
+          margin-top: 0;
+          font-size: 16px;
           color: #1d1f22;
-          letter-spacing: 1.5px;
+          letter-spacing: 0px;
           font-family: 'Raleway', sans-serif !important;
+          font-weight: 400;
+          line-height: 1.6;
+          align-self: flex-start;
         }
         .item-size-selector {
           display: flex;
-          gap: 4px;
-          margin: 0px 0 0px 0;
-          font-family: 'Raleway', sans-serif !important;
+          flex-direction: row;
+          gap: 8px;
+          width: auto;
+          height: 24px;
+          align-items: center;
+          margin-top: 0;
+          align-self: flex-start;
         }
         .size-rect {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 16px;
-          height: 16px;
+          width: 24px;
+          height: 24px;
           border: 1px solid #1d1f22;
           background: #fff;
           color: #1d1f22;
-          font-size: 0.6em;
+          font-size: 16px;
           cursor: pointer;
           text-transform: uppercase;
           transition: all 0.2s;
@@ -259,16 +334,19 @@ const NavigationBar = () => {
           font-family: 'Raleway', sans-serif !important;
         }
         .cart-item-controls {
+          width: 24px;
+          height: 162px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 18px;
-          margin: 0 2px;
+          justify-content: space-between;
+          gap: 0;
+          margin: 0;
           font-family: 'Raleway', sans-serif !important;
         }
         .qty-btn {
-          width: 14px;
-          height: 14px;
+          width: 24px;
+          height: 24px;
           border: 1px solid #1d1f22;
           background: #fff;
           color: #1d1f22;
@@ -352,69 +430,74 @@ const NavigationBar = () => {
           </div>
           <div className="cart-icon" onClick={toggleCart}>
             <FaShoppingCart />
-            <span className="cart-count">{cartItems.length}</span>
+            <span className="cart-count">{cartCount}</span>
           </div>
           {miniCartOpen && (
             <div className="mini-cart">
-              <button
-                className="mini-cart-close-btn"
-                aria-label="Close cart"
-                onClick={() => setMiniCartOpen(false)}
-              >
-                ×
-              </button>
-              {cartItems.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 18 }}>
-                  Your cart is empty.
-                </div>
-              ) : (
-                <>
-                  <h4><span className="bag-title">My Bag,</span> {cartItems.length} items</h4>
-                  <div className="cart-items">
-                    {cartItems.map((item, idx) => (
-                      <div key={idx} className="cart-item">
-                        <div className="cart-item-details">
-                          <div className="item-name">{item.name}</div>
-                          <div className="item-price">${item.price.toFixed(2)}</div>
-                          <div className="item-size-label">SIZE:</div>
-                          <div className="item-size-selector">
-                            {['XS', 'S', 'M', 'L'].map((size) => (
-                              <span
-                                key={size}
-                                className={`size-rect${item.size === size ? ' selected' : ''}`}
-                              >
-                                {size}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="cart-item-controls">
-                          <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx ? { ...ci, quantity: ci.quantity + 1 } : ci))}>+</button>
-                          <div className="item-qty">{item.quantity}</div>
-                          <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx && ci.quantity > 1 ? { ...ci, quantity: ci.quantity - 1 } : ci))}>-</button>
-                        </div>
-                        <img src={item.image} alt={item.name} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="cart-total">
-                    <span className="cart-total-label">Total:</span>
-                    <span className="cart-total-amount">${total.toFixed(2)}</span>
-                  </div>
-                  <div className="cart-buttons">
-                    <button
-                      className="view-bag"
-                      onClick={() => {
-                        setMiniCartOpen(false);
-                        navigate('/cart');
-                      }}
-                    >
-                      VIEW BAG
-                    </button>
-                    <button className="checkout">CHECK OUT</button>
-                  </div>
-                </>
+              {cartItems.length === 0 ? null : (
+                <h4><span className="bag-title">My Bag,</span> {cartCount} items</h4>
               )}
+              <div className="mini-cart-inner">
+                {cartItems.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 18 }}>
+                    Your cart is empty.
+                  </div>
+                ) : (
+                  <>
+                    <div className="cart-items">
+                      {cartItems.map((item, idx) => (
+                        <div key={idx} className="cart-item">
+                          <div className="cart-item-details">
+                            <div className="item-name">{item.name}</div>
+                            <span className="item-price">${item.price.toFixed(2)}</span>
+                            <div className="item-size-label">Size:</div>
+                            <div className="item-size-selector">
+                              {['XS', 'S', 'M', 'L'].map((size) => (
+                                <span
+                                  key={size}
+                                  className={`size-rect${item.size === size ? ' selected' : ''}`}
+                                >
+                                  {size}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="cart-item-controls">
+                            <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx ? { ...ci, quantity: ci.quantity + 1 } : ci))}>+</button>
+                            <div className="item-qty">{item.quantity}</div>
+                            <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => {
+                              if (i === idx) {
+                                if (ci.quantity > 1) return { ...ci, quantity: ci.quantity - 1 };
+                                return null;
+                              }
+                              return ci;
+                            }).filter(Boolean))}>-</button>
+                          </div>
+                          <img src={item.image} alt={item.name} />
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              {cartItems.length > 0 && (
+                <div className="cart-total">
+                  <span className="cart-total-label">Total:</span>
+                  <span className="cart-total-amount">${total.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="cart-buttons">
+                <button
+                  className="view-bag"
+                  onClick={() => {
+                    setMiniCartOpen(false);
+                    navigate('/cart');
+                  }}
+                >
+                  VIEW BAG
+                </button>
+                <button className="checkout">CHECK OUT</button>
+              </div>
             </div>
           )}
         </div>
