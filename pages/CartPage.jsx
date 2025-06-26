@@ -2,10 +2,15 @@ import React from 'react';
 import { useCategory } from './NavigationBar';
 
 const CartPage = () => {
-  const { cartItems = [], setCartItems } = useCategory();
+  const { cartItems = [], setCartItems, currency } = useCategory();
+
+  const currencySymbols = { USD: '$', EUR: '€', JPY: '¥' };
+  const rates = { USD: 1, EUR: 0.92, JPY: 155 };
+  const getSymbol = (cur) => currencySymbols[cur] || '$';
+  const getConverted = (price) => (price * (rates[currency] || 1));
 
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + getConverted(item.price) * item.quantity, 0);
 
   const handleQtyChange = (idx, delta) => {
     setCartItems(prev => {
@@ -170,9 +175,9 @@ const CartPage = () => {
           bottom: 10px;
           right: 10px;
           display: flex;
-          gap: 8px; /* Updated gap to 8px as in your screenshot */
-          width: 56px; /* Hug (56px) */
-          height: 24px; /* Hug (24px) */
+          gap: 8px; 
+          width: 56px; 
+          height: 24px; 
         }
         .cart-arrow-btn {
           background: #2b2b2b;
@@ -245,7 +250,7 @@ const CartPage = () => {
                 {item.description && (
                   <div className="cart-item-desc">{item.description}</div>
                 )}
-                <div className="cart-item-price">${item.price.toFixed(2)}</div>
+                <div className="cart-item-price">{getSymbol(currency)}{getConverted(item.price).toFixed(2)}</div>
                 <div className="cart-size-label">SIZE:</div>
                 <div className="cart-size-selector">
                   {['XS', 'S', 'M', 'L'].map(size => (
@@ -285,7 +290,7 @@ const CartPage = () => {
               <span>Quantity: <b>{totalQuantity}</b></span>
             </div>
             <div className="cart-summary-label-row">
-              <span>Total: <b>${totalPrice.toFixed(2)}</b></span>
+              <span>Total: <b>{getSymbol(currency)}{totalPrice.toFixed(2)}</b></span>
             </div>
           </div>
           <button className="cart-continue-btn">
