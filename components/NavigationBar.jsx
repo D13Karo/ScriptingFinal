@@ -200,7 +200,10 @@ const NavigationBar = () => {
         .cart-item img {
           width: 121px;
           height: 162px;
-          object-fit: cover;
+          object-fit: contain;
+          background: #fff;
+          display: block;
+          margin: 0 auto;
           font-family: 'Raleway', sans-serif !important;
         }
         .cart-total {
