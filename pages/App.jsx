@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import React, { useState } from 'react';
 import CartPage from './CartPage.jsx';
 
-// CategoryProvider to sync category state and routes
 const CategoryProvider = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -16,7 +15,7 @@ const CategoryProvider = ({ children }) => {
     return 'WOMEN';
   });
 
-  // Cart state is shared across the app
+ 
   const [cartItems, setCartItems] = useState([]); 
 
   const handleSetCategory = (cat) => {
@@ -25,7 +24,6 @@ const CategoryProvider = ({ children }) => {
     else navigate(`/${cat.toLowerCase()}`);
   };
 
-  // Provide all needed context values
   return (
     <CategoryContext.Provider value={{
       activeCategory,
