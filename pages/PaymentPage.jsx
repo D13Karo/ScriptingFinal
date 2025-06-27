@@ -1,24 +1,31 @@
-
 import React from 'react';
-import LockFill from './img/LockFill.png';
-import Vector from './img/Vector.png';
-import CreditCardFill from './img/CreditCardFill.png';
+import LockFill from './images/LockFill.png';
+import Vector from './images/Vector.png';
+import CreditCardFill from './images/CreditCardFill.png';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
+import { useCategory } from './NavigationBar';
 
-
-const dress = "https://i.pinimg.com/736x/73/fd/67/73fd6792c3f63f4b63de025b8f78adea.jpg";
 
 const PaymentPage = ({
   contact = "joe.spagnuolo@uxbly.com",
   address = "Via Firenze 23, 92023, Campobello di Licata AG, Italia",
   method = "Standard Shipping - FREE",
-  cartItem = { name: "Demo Dress", price: 29.99, qty: 1 },
-  subtotal = 29.99,
   shippingLabel = "Free Shipping",
-  total = 29.99,
+  shippingCost = 0,
+  total,
   onBack
 }) => {
+  const { cartItems = [], currency } = useCategory();
+  const currencySymbols = { USD: '$', EUR: '€', JPY: '¥' };
+  const rates = { USD: 1, EUR: 0.92, JPY: 155 };
+  const getSymbol = (cur) => currencySymbols[cur] || '$';
+  const getConverted = (price) => (price * (rates[currency] || 1));
+  const subtotalCart = cartItems.reduce((sum, item) => sum + getConverted(item.price) * (item.quantity || 1), 0);
+  let shippingCostValue = 0;
+  if (shippingLabel && shippingLabel.toLowerCase().includes('express')) shippingCostValue = 4.99;
+  if (shippingLabel && shippingLabel.toLowerCase().includes('free')) shippingCostValue = 0;
+  const totalFinal = subtotalCart + getConverted(shippingCostValue);
 
 const [cardNumber, setCardNumber] = useState('');
 const [holderName, setHolderName] = useState('');
@@ -26,6 +33,14 @@ const [expiry, setExpiry] = useState('');
 const [cvv, setCvv] = useState('');
 const [errors, setErrors] = useState({});
 const navigate = useNavigate(); 
+
+  // Format the method string for express shipping
+  let methodDisplay = method;
+  if (method && method.toLowerCase().includes('express')) {
+    methodDisplay = `Express Shipping - ${getSymbol(currency)}${getConverted(4.99).toFixed(2)}`;
+  } else if (method && method.toLowerCase().includes('free')) {
+    methodDisplay = 'Standard Shipping - Free';
+  }
 
   return (
     <div style={{
@@ -91,7 +106,7 @@ const navigate = useNavigate();
             {/* Method */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <div style={{ width: 100, color: '#818181' }}>Method</div>
-              <div style={{ flex: 1, color: '#272727' }}>{method}</div>
+              <div style={{ flex: 1, color: '#272727' }}>{methodDisplay}</div>
             </div>
           </div>
 
@@ -315,7 +330,14 @@ const navigate = useNavigate();
   setErrors(newErrors);
 
   if (Object.keys(newErrors).length === 0) {
-    navigate('/confirmation');
+    navigate('/confirmation', {
+  state: {
+    contact,
+    address,
+    shippingCost: shippingCostValue,
+  },
+});
+
   }
 }}
 
@@ -357,42 +379,50 @@ const navigate = useNavigate();
   }}
 >
   <div style={{ width: '100%', maxWidth: 500 }}>
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 32 }}>
-      <div style={{ position: 'relative', width: 110, height: 110, marginRight: 24 }}>
-        <img 
-          src={dress} 
-          alt={cartItem.name} 
-          style={{ 
-            width: 110, 
-            height: 110, 
-            borderRadius: 8, 
-            objectFit: 'cover',
-            display: 'block'
-          }}
-        />
-        <div style={{
-          position: 'absolute',
-          top: -10,
-          right: -10,
-          background: '#6cbe8e',
-          color: '#fff',
-          borderRadius: '50%',
-          width: 28,
-          height: 28,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 600,
-          fontSize: 16,
-          boxShadow: '0 2px 8px #0001'
-        }}>
-          {cartItem.qty}
-        </div>
-      </div>
-      <div>
-        <div style={{ fontWeight: 500, fontSize: 26, marginBottom: 8, color: '#272727' }}>{cartItem.name}</div>
-        <div style={{ color: '#56B280', fontWeight: 600, fontSize: 20 }}>${cartItem.price.toFixed(2)}</div>
-      </div>
+    <div style={{ maxHeight: 390, overflowY: 'auto', marginBottom: 8, paddingRight: 8, paddingTop: 10 }}>
+      {cartItems.length === 0 ? (
+        <div style={{ color: '#888', textAlign: 'center', marginTop: 40 }}>Your cart is empty.</div>
+      ) : (
+        cartItems.map((item, idx) => (
+          <div key={idx} style={{ display: 'flex', alignItems: 'center', marginBottom: 32 }}>
+            <div style={{ position: 'relative', width: 110, height: 110, marginRight: 24 }}>
+              <img
+                src={item.image}
+                alt={item.name}
+                style={{
+                  width: 110,
+                  height: 110,
+                  borderRadius: 8,
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+              />
+              <div style={{
+                position: 'absolute',
+                top: -10,
+                right: -10,
+                background: '#6cbe8e',
+                color: '#fff',
+                borderRadius: '50%',
+                width: 28,
+                height: 28,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 600,
+                fontSize: 16,
+                boxShadow: '0 2px 8px #0001'
+              }}>
+                {item.quantity}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontWeight: 500, fontSize: 26, marginBottom: 8, color: '#272727' }}>{item.name} {item.size && (<span style={{fontWeight:400, fontSize:20, color:'#888'}}>({item.size})</span>)}</div>
+              <div style={{ color: '#56B280', fontWeight: 600, fontSize: 20 }}>{getSymbol(currency)}{getConverted(item.price).toFixed(2)}</div>
+            </div>
+          </div>
+        ))
+      )}
     </div>
     <div style={{ borderTop: '1px solid #e0e0e0', margin: '24px 0' }} />
     <div style={{ 
@@ -402,17 +432,16 @@ const navigate = useNavigate();
       fontSize: 14
     }}>
       <span style={{ color: '#666' }}>Subtotal</span>
-      <span>${subtotal.toFixed(2)}</span>
+      <span>{getSymbol(currency)}{subtotalCart.toFixed(2)}</span>
     </div>
     <div style={{ 
       marginBottom: 16, 
       display: 'flex', 
       justifyContent: 'space-between',
-      fontSize: 14,
-
+      fontSize: 14
     }}>
       <span style={{ color: '#666' }}>Shipping</span>
-      <span>{shippingLabel}</span>
+      <span>{shippingLabel === 'Free Shipping' ? 'Free' : getSymbol(currency) + getConverted(shippingCostValue).toFixed(2)}</span>
     </div>
     <div style={{ borderTop: '1px solid #e0e0e0', margin: '24px 0' }} />
     <div style={{ 
@@ -423,7 +452,7 @@ const navigate = useNavigate();
       marginBottom: 24
     }}>
       <span>Total</span>
-      <span>${total.toFixed(2)}</span>
+      <span>{getSymbol(currency)}{totalFinal.toFixed(2)}</span>
     </div>
   </div>
 </div>
