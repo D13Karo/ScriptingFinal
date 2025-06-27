@@ -1,14 +1,50 @@
-
 import React, { useState } from 'react';
+import down from './images/down.png'; 
+import ShippingMethodPage from './ShippingMethodPage';
+import { useNavigate } from 'react-router-dom';
+const dress = "https://i.pinimg.com/736x/73/fd/67/73fd6792c3f63f4b63de025b8f78adea.jpg";
 
-const ShippingInfoPage = () => {
+const StyledInput = ({ style, error, ...props }) => {
+  const [focused, setFocused] = useState(false);
+  return (
+    <input
+      {...props}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      style={{
+        ...style,
+        border: `1px solid ${error ? '#e74c3c' : (focused ? '#56B280' : '#898989')}`,
+         outline: 'none',
+        boxShadow: 'none',
+        background: 'transparent'
+      }}
+    />
+  );
+};
 
-  const navigate = (path) => {
-    console.log(`Simulating navigation to: ${path}`);
-  };
+const StyledSelect = ({ style, children, error, ...props }) => {
+  const [focused, setFocused] = useState(false);
+  return (
+    <select
+      {...props}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      style={{
+        ...style,
+        border: `1px solid ${error ? '#e74c3c' : (focused ? '#56B280' : '#898989')}`,
+        outline: 'none',
+        boxShadow: 'none',
+        background: 'transparent'
+      }}
+    >
+      {children}
+    </select>
+  );
+};
 
-  const [formData, setFormData] = useState({
-    emailOrPhone: '',
+const ShippingInfoPage = ({ contact: initialContact, address: initialAddress, cartItem, subtotal, onBack, onNext }) => {
+  const [form, setForm] = useState({
+    email: '',
     firstName: '',
     lastName: '',
     address: '',
@@ -16,635 +52,512 @@ const ShippingInfoPage = () => {
     city: '',
     postalCode: '',
     province: '',
-    country: 'Italy',
-    saveInfo: false,
+    country: '',
+    saveInfo: false
   });
-
+  
   const [errors, setErrors] = useState({});
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+  
+  const demoCartItem = {
+    name: "Running Short",
+    price: 50.00,
+    qty: 1
   };
 
-  const validate = () => {
-    let newErrors = {};
-    let isValid = true;
-    if (!formData.emailOrPhone.trim()) {
-      newErrors.emailOrPhone = 'Email or mobile phone number is required.';
-      isValid = false;
-    }
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required.';
-      isValid = false;
-    }
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required.';
-      isValid = false;
-    }
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required.';
-      isValid = false;
-    }
-    if (!formData.city.trim()) {
-      newErrors.city = 'City is required.';
-      isValid = false;
-    }
-    if (!formData.postalCode.trim()) {
-      newErrors.postalCode = 'Postal code is required.';
-      isValid = false;
-    }
-    if (!formData.province.trim()) {
-      newErrors.province = 'Province is required.';
-      isValid = false;
-    }
-    if (!formData.country.trim()) {
-      newErrors.country = 'Country is required.';
-      isValid = false;
-    }
-    setErrors(newErrors);
-    return isValid;
+  const inputStyle = {
+    flex: 1,
+    padding: 12,
+    width: '100%',
+    borderRadius: 0,
+    fontSize: 14,
+    boxSizing: 'border-box'
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate()) {
-      console.log('Form data submitted successfully:', formData);
-      navigate('/shipping');
-    } else {
-      console.log('Form validation failed. Please check the errors.', errors);
+  cartItem = cartItem || demoCartItem;
+  subtotal = subtotal || demoCartItem.price;
+
+  const validateForm = () => {
+    const newErrors = {};
+    // Email
+  if (!form.email.trim()) {
+    newErrors.email = 'Email is required';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    newErrors.email = 'Please enter a valid email address';
+  }
+
+  // First Name
+  if (!form.firstName.trim()) {
+    newErrors.firstName = 'First name is required';
+  } else if (form.firstName.length < 2) {
+    newErrors.firstName = 'First name must be at least 2 characters';
+  }
+
+  // Last Name
+  if (!form.lastName.trim()) {
+    newErrors.lastName = 'Last name is required';
+  } else if (form.lastName.length < 2) {
+    newErrors.lastName = 'Last name must be at least 2 characters';
+  }
+
+  // Address
+  if (!form.address.trim()) {
+    newErrors.address = 'Address is required';
+  } else if (form.address.length < 5) {
+    newErrors.address = 'Address must be at least 5 characters';
+  }
+
+  // City
+  if (!form.city.trim()) {
+    newErrors.city = 'City is required';
+  } else if (form.city.length < 2) {
+    newErrors.city = 'City must be at least 2 characters';
+  }
+
+  // Postal Code
+  if (!form.postalCode.trim()) {
+    newErrors.postalCode = 'Postal code is required';
+  } else if (!/^\d+$/.test(form.postalCode)) {
+    newErrors.postalCode = 'Postal code must be numbers only';
+  } else if (form.postalCode.length < 4) {
+    newErrors.postalCode = 'Postal code must be at least 4 digits';
+  }
+
+  // Province
+  if (!form.province) {
+    newErrors.province = 'Province is required';
+  }
+
+  // Country
+  if (!form.country) {
+    newErrors.country = 'Country is required';
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+  const handleInputChange = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
+const navigate = useNavigate();
+
+const handleContinue = () => {
+  if (validateForm()) {
+    if (onNext) onNext(form);
+    navigate('/shipping', { state: { contact: form.email, address: `${form.address}, ${form.postalCode}, ${form.city}, ${form.province} ${form.country}` } });
+  }
+};
+
+
+
 
   return (
-    <>
-      <style>{`
-        body {
-          margin: 0;
-          font-family: 'Inter', sans-serif;
-          background: #fff;
-          min-height: 100vh;
-          width: 100vw;
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: stretch;
-          box-sizing: border-box;
-        }
+    <div style={{ display: 'flex', background: '#fafafa', minHeight: '100vh', margin: '0 auto' }}>
+      
+      {/* Left Side */}
+      <div style={{
+        flex: 1,
+        padding: 40,
+        background: '#fff',
+        maxWidth: '50%',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}>
+        <div style={{ width: '100%', maxWidth: 445 }}>
 
-        .page-wrapper {
-          width: 1440px;
-          min-height: 100vh;
-          max-width: 1440px;
-          margin-left: auto;
-          margin-right: auto;
-          padding: 48px 0 0 0;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-          background: #fff;
-        }
-
-        .breadcrumb-container {
-          width: 100%;
-          margin-bottom: 24px;
-          display: flex;
-          justify-content: center;
-        }
-
-        .breadcrumb {
-          display: flex;
-          align-items: center;
-          font-size: 14px;
-          color: #666;
-          max-width: 900px;
-          width: 100%;
-          justify-content: flex-start;
-        }
-
-        .breadcrumb .link-green {
-          color: #2ecc40;
-          text-decoration: none;
-          font-weight: 500;
-        }
-
-        .breadcrumb .divider {
-          margin: 0 8px;
-          color: #ccc;
-        }
-
-        .breadcrumb .active-step {
-          font-weight: 600;
-          color: #333;
-        }
-
-        .shipping-info-container {
-          display: flex;
-          flex-direction: row;
-          align-items: flex-start;
-          justify-content: flex-start;
-          width: 1440px;
-          font-family: sans-serif;
-          background: #fff;
-          box-sizing: border-box;
-          gap: 60px;
-          border-radius: 12px;
-          box-shadow: 0 2px 16px rgba(0,0,0,0.04);
-        }
-
-        .shipping-form {
-          flex: 1 1 50%;
-          max-width: 600px;
-          min-width: 380px;
-          display: flex;
-          flex-direction: column;
-          background: #fafbfc;
-          border-radius: 12px;
-          padding: 0;
-          margin-top: 48px;
-          margin-left: 48px;
-          align-items: flex-start;
-        }
-
-        .shipping-form h3 {
-          margin-top: 32px;
-          margin-bottom: 18px;
-          font-size: 24px;
-          color: #111;
-          font-weight: 600;
-        }
-
-        .form-group {
-          margin-bottom: 18px;
-        }
-
-        .form-group label {
-          font-size: 15px;
-          font-weight: 500;
-          margin-bottom: 6px;
-          display: block;
-          color: #555;
-        }
-
-        .form-group input,
-        .form-group select {
-          width: 100%;
-          height: 40px;
-          padding: 0 14px;
-          border: 1px solid #b7e5c6;
-          border-radius: 2px;
-          font-size: 18px;
-          box-sizing: border-box;
-          background: #fff;
-          transition: border-color 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-          outline: none;
-          border-color: #2ecc40;
-          box-shadow: 0 0 0 1.5px #2ecc40;
-        }
-
-        /* Ensure their parent is a flex row and they fill the box */
-        .special-row {
-          display: flex;
-          flex-direction: row;
-          gap: 12.5px;
-          width: 100%;
-        }
-
-        .special-row .form-group {
-          width: 440px;
-          min-width: 0;
-          margin-bottom: 0;
-        }
-
-        .name-fields {
-          display: flex;
-          gap: 12.5px;
-          width: 100%;
-        }
-
-        .name-fields .form-group {
-          flex: 1;
-          margin-bottom: 0;
-        }
-
-        .flex-row-inputs {
-          display: flex;
-          gap: 12.5px;
-          width: 100%;
-          margin-top: 0;
-        }
-
-        .flex-row-inputs .form-group {
-          flex: 1;
-          margin-bottom: 0;
-        }
-
-        .checkbox {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-top: 18px;
-          margin-bottom: 32px;
-          font-size: 15px;
-          color: #555;
-        }
-
-        .checkbox input[type="checkbox"] {
-          width: 18px;
-          height: 18px;
-          accent-color: #2ecc40;
-        }
-
-        .button-group {
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
-          margin-top: 48px;
-          gap: 40px;
-        }
-
-        .back-button {
-          background: none;
-          border: none;
-          color: #2ecc40;
-          text-decoration: underline;
-          font-size: 18px;
-          cursor: pointer;
-          padding: 0;
-          transition: color 0.2s;
-        }
-
-        .back-button:hover {
-          color: #1e7e34;
-        }
-
-        .continue-button {
-          background-color: #2ecc40;
-          color: white;
-          border: none;
-          padding: 18px 80px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 22px;
-          font-weight: 700;
-          transition: background 0.2s, box-shadow 0.2s;
-          box-shadow: 0 4px 12px rgba(46, 204, 64, 0.12);
-        }
-
-        .continue-button:hover {
-          background-color: #1e7e34;
-          box-shadow: 0 6px 16px rgba(46, 204, 64, 0.18);
-        }
-
-        .error {
-          color: #e74c3c;
-          font-size: 13px;
-          margin-top: 4px;
-          display: block;
-        }
-
-        .order-summary {
-          flex: 0 0 480px;
-          max-width: 480px;
-          min-width: 340px;
-          border-left: 1px solid #e0e0e0;
-          padding-left: 56px;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          background: #fff;
-          margin-top: 48px;
-        }
-
-        .order-summary-product {
-          display: flex;
-          align-items: center;
-          gap: 24px;
-          margin-bottom: 24px;
-          width: 100%;
-        }
-
-        .order-summary-image-wrapper {
-          position: relative;
-          width: 100px;
-          height: 100px;
-          border-radius: 8px;
-          overflow: hidden;
-          border: 1px solid #eee;
-        }
-
-        .order-summary img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-        }
-
-        .order-summary-quantity-badge {
-          position: absolute;
-          top: -8px;
-          right: -8px;
-          background-color: #2ecc40;
-          color: white;
-          border-radius: 50%;
-          width: 24px;
-          height: 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 15px;
-          font-weight: bold;
-          border: 2px solid #fff;
-        }
-
-        .order-summary-product-details h4 {
-          font-size: 28px;
-          margin: 0 0 8px 0;
-          color: #222;
-          font-weight: 400;
-        }
-
-        .order-summary-product-details .price {
-          font-size: 24px;
-          font-weight: 600;
-          color: #2ecc40;
-          margin: 0;
-          margin-bottom: 8px;
-        }
-
-        .summary-breakdown {
-          width: 100%;
-          padding-top: 24px;
-          border-top: 1px solid #e0e0e0;
-        }
-
-        .summary-breakdown p {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 20px;
-          font-size: 18px;
-          color: #222;
-          padding: 0 8px;
-          letter-spacing: 0.5px;
-        }
-
-        .summary-breakdown p span {
-          font-weight: 600;
-          color: #222;
-          letter-spacing: 0.5px;
-        }
-
-        .summary-breakdown hr {
-          border: none;
-          border-top: 1px solid #e0e0e0;
-          margin: 24px 0;
-        }
-
-        .total {
-          font-size: 28px;
-          font-weight: bold;
-          color: #222;
-          margin-top: 12px;
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          padding: 0 8px;
-        }
-
-        .navbar {
-          width: 1440px;
-          height: 75px;
-          margin-left: auto;
-          margin-right: auto;
-          display: flex;
-          align-items: center;
-          background: #fff;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-          border-radius: 12px;
-          padding: 0 32px;
-          box-sizing: border-box;
-        }
-
-        @media (max-width: 900px) {
-          .page-wrapper {
-            width: 100vw;
-            max-width: 100vw;
-            padding: 20px;
-          }
-          .breadcrumb-container {
-            margin-bottom: 20px;
-          }
-          .shipping-info-container {
-            width: 100vw;
-            max-width: 100vw;
-            flex-direction: column;
-            align-items: stretch;
-            padding: 0;
-            gap: 32px;
-            box-shadow: none;
-            border-radius: 0;
-          }
-          .shipping-form {
-            max-width: 100%;
-            min-width: 0;
-            margin-left: 0;
-            margin-top: 0;
-            padding: 24px 8px 20px 8px;
-          }
-          .order-summary {
-            max-width: 100%;
-            min-width: 0;
-            padding-left: 0;
-            padding-top: 40px;
-            padding-bottom: 24px;
-            border-left: none;
-            border-top: 1px solid #eee;
-            margin-top: 0;
-          }
-          .name-fields {
-            flex-direction: column;
-            gap: 0;
-          }
-          .flex-row-inputs {
-            flex-direction: column;
-            gap: 0;
-          }
-          .name-fields .form-group,
-          .flex-row-inputs .form-group {
-            margin-bottom: 18px;
-            height: auto;
-          }
-          .name-fields .form-group,
-          .flex-row-inputs .form-group {
-            margin-bottom: 18px;
-            height: auto;
-          }
-        }
-      `}</style>
-      <div className="page-wrapper">
-        <div className="breadcrumb-container">
-          <div className="breadcrumb">
-            <a href="/cart" className="link-green">Cart</a>
-            <span className="divider">›</span>
-            <span className="active-step">Details</span>
-            <span className="divider">›</span>
-            <span>Shipping</span>
-            <span className="divider">›</span>
-            <span>Payment</span>
+          <div style={{ color: '#6cbe8e', marginBottom: 24, fontSize: 14 }}>
+            <span style={{ color: '#56B280', fontWeight: 'bold' }}>Cart</span> &gt;
+            <span style={{ color: '#272727', fontWeight: 'bold' }}> Details</span> &gt;
+            <span style={{ color: '#616161', fontWeight: 500 }}> Shipping</span> &gt;
+            <span style={{ color: '#616161', fontWeight: 500 }}> Payment</span>
           </div>
-        </div>
-        <div className="shipping-info-container">
-          <form className="shipping-form" onSubmit={handleSubmit}>
-            <h3>Contact</h3>
-            <div className="form-group">
-              <input
-                type="text"
-                id="emailOrPhone"
-                name="emailOrPhone"
-                placeholder="Email or mobile phone number"
-                value={formData.emailOrPhone}
-                onChange={handleChange}
-              />
-              {errors.emailOrPhone && <span className="error">{errors.emailOrPhone}</span>}
+
+          <div style={{ marginBottom:4 }}>
+            <div style={{ fontWeight: 500, fontSize: 20, marginBottom: 10 }}>Contact</div>
+            <StyledInput
+  type="email"
+  placeholder="Email or mobile phone number"
+  value={form.email}
+  onChange={(e) => handleInputChange('email', e.target.value)}
+  error={errors.email}
+  style={{
+    width: '100%',
+    padding: 12,
+    fontSize: 14,
+    borderRadius: 0,
+    boxSizing: 'border-box'
+  }}
+  title={errors.email || ''}
+/>
+<div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom:2 }}>
+  {errors.email || ''}
+</div>
+</div>
+
+   <div>
+    <div style={{ fontWeight: 500, fontSize: 20, marginBottom: 9 }}>Shipping Address</div>
+
+           <div style={{ display: 'flex', gap: 12, marginBottom: 0 }}>
+            <div style={{ flex: 1 }}>
+              <StyledInput
+      placeholder="Name"
+      value={form.firstName}
+      onChange={(e) => handleInputChange('firstName', e.target.value)}
+      error={errors.firstName}
+      title={errors.firstName || ''}
+      style={inputStyle}
+    />
+    <div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom: 2 }}>
+      {errors.firstName || ''}
+    </div>
+  </div>
+              <div style={{ flex: 1 }}>
+    <StyledInput
+      placeholder="Second Name"
+      value={form.lastName}
+      onChange={(e) => handleInputChange('lastName', e.target.value)}
+      error={errors.lastName}
+      title={errors.lastName || ''}
+      style={inputStyle}
+    />
+    <div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom:2 }}>
+      {errors.lastName || ''}
+    </div>
+  </div>
             </div>
-            <h3>Shipping Address</h3>
-            <div className="name-fields">
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
-                {errors.firstName && <span className="error">{errors.firstName}</span>}
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
-                {errors.lastName && <span className="error">{errors.lastName}</span>}
-              </div>
-            </div>
-            <div className="form-group">
-              <input
-                type="text"
-                id="address"
-                name="address"
-                placeholder="Address and number"
-                value={formData.address}
-                onChange={handleChange}
-              />
-              {errors.address && <span className="error">{errors.address}</span>}
-            </div>
-            <div className="form-group">
-              <input
-                type="text"
-                id="shippingNote"
-                name="shippingNote"
-                placeholder="Shipping note (optional)"
-                value={formData.shippingNote}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex-row-inputs">
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  placeholder="City"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-                {errors.city && <span className="error">{errors.city}</span>}
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="postalCode"
-                  name="postalCode"
-                  placeholder="Postal Code"
-                  value={formData.postalCode}
-                  onChange={handleChange}
-                />
-                {errors.postalCode && <span className="error">{errors.postalCode}</span>}
-              </div>
-              <div className="form-group">
-                <select
-                  id="province"
-                  name="province"
-                  value={formData.province}
-                  onChange={handleChange}
+
+
+
+           <StyledInput
+  placeholder="Address and number"
+  value={form.address}
+  onChange={(e) => handleInputChange('address', e.target.value)}
+  error={errors.address}
+  title={errors.address || ''}
+  style={{ ...inputStyle, width: '100%', marginBottom: 0 }}
+/>
+<div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom: 2 }}>
+  {errors.address || ''}
+</div>
+
+
+<StyledInput 
+      placeholder="Shipping note (optional)" 
+     value={form.shippingNote}
+      onChange={(e) => handleInputChange('shippingNote', e.target.value)}
+     style={{ ...inputStyle, width: '100%', marginBottom: 12 }} 
+/>
+
+
+            <div style={{ display: 'flex', gap: 12, marginBottom: 0 }}>
+  <div style={{ flex: 1 }}>
+    <StyledInput
+      placeholder="City"
+      value={form.city}
+      onChange={(e) => handleInputChange('city', e.target.value)}
+      error={errors.city}
+      title={errors.city || ''}
+      style={{ ...inputStyle, width: '100%' }}
+    />
+    <div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom: 8 }}>
+      {errors.city || ''}
+    </div>
+  </div>
+  <div style={{ flex: 1 }}>
+    <StyledInput
+      placeholder="Postal Code"
+      value={form.postalCode}
+      onChange={(e) => handleInputChange('postalCode', e.target.value)}
+      error={errors.postalCode}
+      title={errors.postalCode || ''}
+      style={{ ...inputStyle, width: '100%' }}
+      inputMode="numeric"
+      pattern="[0-9]*"
+    />
+    <div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom: 8 }}>
+      {errors.postalCode || ''}
+    </div>
+  </div>
+
+
+
+  
+              <div style={{ position: 'relative', flex: 1 }}>
+                <label style={{
+                  position: 'absolute',
+                  top: 6,
+                  left: 7,
+                  fontSize: 10,
+                  backgroundColor: '#fff',
+                  padding: '0 4px',
+                  color: '#616161',
+                  zIndex: 1,
+                  pointerEvents: 'none'
+                }}>
+                  Province
+                </label>
+
+                <div style={{
+                  position: 'absolute',
+                  top: '8px',
+                  bottom: '8px',
+                  right: '36px',
+                  width: '0.25px',
+                  height: '35%',
+                  backgroundColor: '#89898980'
+                }} />
+
+                <div style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '22%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  width: '12px',
+                  height: '12px'
+                }}>
+                  <img src={down} alt="Dropdown Arrow" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+
+                <StyledSelect 
+                  value={form.province}
+                  onChange={(e) => handleInputChange('province', e.target.value)}
+                  error={errors.province}
+                  title={errors.province || ''}
+                  style={{
+                    width: '100%',
+                    padding: '16px 10px 8px 10px',
+                    fontSize: 14,
+                    borderRadius: 0,
+                    appearance: 'none',
+                    backgroundColor: 'transparent',
+                    paddingRight: '30px',
+                    boxSizing: 'border-box',
+                    height: 'auto'
+                  }}
                 >
-                  <option value="">Province</option>
-                  <option value="RM">Rome</option>
-                  <option value="MI">Milan</option>
-                </select>
-                {errors.province && <span className="error">{errors.province}</span>}
+                  <option value="" disabled>province</option>
+                  <option value="AB">Alberta</option>
+                  <option value="NL">Newfoundland</option>
+                  <option value="ON">Ontario</option>
+                  <option value="QC">Quebec</option>
+                </StyledSelect>
+                <div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom: 8 }}>
+    {errors.province || ''}
+  </div>
               </div>
             </div>
-            <div className="form-group">
-              <select
-                id="country"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
+
+            <div style={{ position: 'relative', flex: 1, marginBottom:4 }}>
+              <label style={{
+                position: 'absolute',
+                top: 6,
+                left: 7,
+                fontSize: 10,
+                backgroundColor: '#fff',
+                padding: '0 4px',
+                color: '#616161',
+                zIndex: 1,
+                pointerEvents: 'none',
+              }}>
+                Country/Region
+              </label>
+
+              <div style={{
+                  position: 'absolute',
+                  top: '8px',
+                  bottom: '8px',
+                  right: '36px',
+                  width: '0.25px',
+                  height: '45%',
+                  backgroundColor: '#89898980'
+                }} />
+
+                <div style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '25%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  width: '12px',
+                  height: '12px'
+                }}>
+                <img src={down} alt="Dropdown Arrow" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
+
+              <StyledSelect 
+                value={form.country}
+                onChange={(e) => handleInputChange('country', e.target.value)}
+                error={errors.country}
+                title={errors.country || ''}
+                style={{
+                  width: '100%',
+                  padding: '16px 10px 8px 10px',
+                  fontSize: 14,
+                  borderRadius: 0,
+                  appearance: 'none',
+                  backgroundColor: 'transparent',
+                  paddingRight: '30px',
+                  boxSizing: 'border-box',
+                  height: 'auto'
+                }}
               >
+                <option value="" disabled>Select</option>
                 <option value="Italy">Italy</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Japan">Japan</option>
                 <option value="USA">USA</option>
-                <option value="France">France</option>
-              </select>
-              {errors.country && <span className="error">{errors.country}</span>}
+                <option value="China">China</option>
+              </StyledSelect>
+              <div style={{ minHeight: 18, color: '#e74c3c', fontSize: 12, marginBottom: 8 }}>
+    {errors.country || ''}
+  </div>
             </div>
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                name="saveInfo"
-                checked={formData.saveInfo}
-                onChange={handleChange}
+
+            <label style={{ fontSize: 12 }}>
+              <input 
+                type="checkbox" 
+                checked={form.saveInfo}
+                onChange={(e) => handleInputChange('saveInfo', e.target.checked)}
+                style={{ marginRight: 8 }} 
               />
-              Save these informations for a future fast checkout
+              Save this information for a future fast checkout
             </label>
-            <div className="button-group">
-              <a href="/cart" className="back-button">Back to cart</a>
-              <button type="submit" className="continue-button">Go to shipping</button>
-            </div>
-          </form>
-          <div className="order-summary">
-            <div className="order-summary-product">
-              <div className="order-summary-image-wrapper">
-                <img src="https://placehold.co/80x80/cccccc/ffffff?text=Product" alt="product" />
-                <span className="order-summary-quantity-badge">1</span>
-              </div>
-              <div className="order-summary-product-details">
-                <h4>Running Short</h4>
-                <p className="price">$ 50.00</p>
-              </div>
-            </div>
-            <div className="summary-breakdown">
-              <p>Subtotal <span>$ 50.00</span></p>
-              <p>Shipping <span>Calculated at the next step</span></p>
-              <hr />
-              <p className="total">Total <span>$ 50.00</span></p>
+
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+               marginTop: 45,
+              borderTop: '1px solid #e0e0e0',
+              paddingTop: 24
+            }}>
+              <button
+                onClick={onBack}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#56B280',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: 16,
+                  padding: '12px 0',
+                  textDecoration: 'underline'
+                }}
+              >
+                Back to cart
+              </button>
+              <button
+                onClick={handleContinue}
+                style={{
+                  background: '#56B280',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '12px 32px',
+                  fontWeight: 600,
+                  fontSize: 16,
+                  cursor: 'pointer'
+                }}
+              >
+                Go to shipping
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </>
+
+
+      
+
+      {/* Right Side */}
+      <div style={{
+        flex: 1,
+        padding: 40,
+        background: '#F2F2F2',
+        maxWidth: '50%',
+        boxSizing: 'border-box',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+      }}>
+        <div style={{ width: '100%', maxWidth: 500 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 32 }}>
+            <div style={{ position: 'relative', width: 110, height: 110, marginRight: 24 }}>
+              <img
+                src={dress}
+                alt={cartItem.name}
+                style={{
+                  width: 110,
+                  height: 110,
+                  borderRadius: 8,
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+              />
+              <div style={{
+                position: 'absolute',
+                top: -10,
+                right: -10,
+                background: '#6cbe8e',
+                color: '#fff',
+                borderRadius: '50%',
+                width: 28,
+                height: 28,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 600,
+                fontSize: 16,
+                boxShadow: '0 2px 8px #0001'
+              }}>
+                {cartItem.qty}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontWeight: 500, fontSize: 26, marginBottom: 8, color: '#272727' }}>{cartItem.name}</div>
+              <div style={{ color: '#56B280', fontWeight: 600, fontSize: 20 }}>${cartItem.price.toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid #e0e0e0', margin: '24px 0' }} />
+          <div style={{
+            marginBottom: 16,
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontSize: 14
+          }}>
+            <span style={{ color: '#666' }}>total</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+          <div style={{
+            marginBottom: 44,
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontSize: 14
+          }}>
+            <span style={{ color: '#616161' }}>Shipping</span>
+            <span style={{ color: '#616161' }}>Calculated at the next step</span>
+          </div>
+          <div style={{ borderTop: '1px solid #e0e0e0', margin: '24px 0' }} />
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontWeight: 700,
+            fontSize: 14,
+            marginBottom: 24
+          }}>
+            <span>Total</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default ShippingInfoPage;
-
