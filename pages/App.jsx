@@ -2,12 +2,12 @@ import './App.css';
 import ProductListingPage from './ProductListingPage.jsx';
 import ProductDetailPage from './ProductDetailPage.jsx';
 import NavigationBar, { CategoryContext } from './NavigationBar.jsx';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import React, { useState } from 'react';
 import CartPage from './CartPage.jsx';
-import ShippingInfoPage from './ShippingInfoPage.jsx';
 import ShippingMethodPage from './ShippingMethodPage.jsx';
 import PaymentConfirmationPage from './PaymentConfirmationPage.jsx';
+import ShippingInfoPage from './ShippingInfoPage.jsx';
 
 const CategoryProvider = ({ children }) => {
   const location = useLocation();
@@ -43,24 +43,25 @@ const CategoryProvider = ({ children }) => {
 };
 
 function App() {
+  const location = useLocation();
+  // Hide NavigationBar on info, shipping, payment, confirmation pages
+  const hideNav = ['/shippinginfo', '/shipping', '/payment', '/confirmation'].some(path => location.pathname.startsWith(path));
   return (
     <div className="App raleway-font">
-      <BrowserRouter>
-        <CategoryProvider>
-          <NavigationBar />
-          <Routes>
-            <Route path="/" element={<ProductListingPage />} />
-            <Route path="/men" element={<ProductListingPage />} />
-            <Route path="/kids" element={<ProductListingPage />} />
-            <Route path="/product/:id" element={<ProductDetailPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/shippinginfo" element={<ShippingInfoPage />} />
-            <Route path="/shipping" element={<ShippingMethodPage />} />
-            <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/confirmation" element={<PaymentConfirmationPage />} />
-          </Routes>
-        </CategoryProvider>
-      </BrowserRouter>
+      <CategoryProvider>
+        {!hideNav && <NavigationBar />}
+        <Routes>
+          <Route path="/" element={<ProductListingPage />} />
+          <Route path="/men" element={<ProductListingPage />} />
+          <Route path="/kids" element={<ProductListingPage />} />
+          <Route path="/product/:id" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/shippinginfo" element={<ShippingInfoPage/>} />
+          <Route path="/shipping" element={<ShippingMethodPage />} />
+          <Route path ="/payment" element={<PaymentConfirmationPage />} />
+          <Route path="/confirmation" element={<PaymentConfirmationPage />} />
+        </Routes>
+      </CategoryProvider>
     </div>
   );
 }
