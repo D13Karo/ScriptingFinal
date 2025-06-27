@@ -18,6 +18,7 @@ import GreenDress from './images/GreenDress.jpg';
 import RedDress from './images/RedDress.jpg';
 import MenBlackJeans from './images/MenBlackJeans.jpg';
 import MenBlackShirt from './images/MenBlackShirt.jpg';
+import MenBlackShirt2 from './images/MenBlackShirt2.jpg';
 import { useCategory } from './NavigationBar.jsx';
 
 const styles = {
@@ -214,6 +215,12 @@ const allProducts = [
     description: "A timeless black shirt from Next, tailored for a classic yet contemporary look. Perfect for both formal and casual wear." }
 ];
 
+// Map of extra images for products
+const extraImages = {
+  18: [MenBlackShirt2, MenBlackShirt],
+  // Add more product IDs and extra images here as needed
+};
+
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -228,7 +235,16 @@ const ProductDetailPage = () => {
 
   const [selectedSize, setSelectedSize] = useState('S');
   const sizes = ['XS', 'S', 'M', 'L'];
-  const images = [product.image, product.image, product.image];
+  // Thumbnails: for MenBlackShirt, show MenBlackShirt2 as the second thumbnail
+  const images = product.id === 18
+    ? [product.image, MenBlackShirt2, product.image]
+    : [product.image, product.image, product.image];
+  const mainImages = [
+    product.image,
+    extraImages[product.id]?.[0] || product.image,
+    extraImages[product.id]?.[1] || product.image
+  ];
+  const [selectedImageIdx, setSelectedImageIdx] = useState(0);
 
   if (!product) {
     return <div style={{ padding: 40, fontFamily: 'Raleway, sans-serif' }}>Product not found.</div>;
@@ -266,90 +282,229 @@ const ProductDetailPage = () => {
   };
 
   return (
-    <div style={styles.pdpRoot}>
+    <div style={{
+      ...styles.pdpRoot,
+      minHeight: '100vh',
+      minWidth: 0,
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      boxSizing: 'border-box',
+    }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
+        .pdp-flex-row {
+          display: flex;
+          flex-direction: row;
+        }
+        .pdp-thumbnails {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-right: 16px;
+        }
+        .pdp-thumbnails img {
+          width: 6vw;
+          min-width: 50px;
+          max-width: 79px;
+          height: auto;
+          max-height: 80px;
+          object-fit: contain;
+          border-radius: 2px;
+        }
+        .pdp-inner {
+          display: flex;
+          flex-direction: row;
+          width: 70vw;
+          max-width: 1002px;
+          min-width: 320px;
+          height: auto;
+          background: #fff;
+          margin-top: 0;
+          box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .pdp-image-placeholder {
+          width: 40vw;
+          min-width: 180px;
+          max-width: 610px;
+          height: auto;
+          max-height: 511px;
+          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .pdp-image-placeholder img {
+          width: 100%;
+          height: 100%;
+          max-width: 610px;
+          max-height: 511px;
+          object-fit: contain;
+        }
+        .pdp-info {
+          flex: 1;
+          padding: 3vw 3vw 3vw 2vw;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+        }
+        @media (max-width: 900px) {
+          .pdp-inner {
+            flex-direction: column;
+            width: 95vw;
+            min-width: 0;
+          }
+          .pdp-image-placeholder {
+            width: 100%;
+            max-width: 100vw;
+            min-width: 0;
+            max-height: 300px;
+          }
+          .pdp-info {
+            padding: 2vw 2vw 2vw 2vw;
+          }
+          .pdp-thumbnails {
+            flex-direction: row;
+            gap: 10px;
+            margin-right: 0;
+            margin-bottom: 10px;
+          }
+          .pdp-thumbnails img {
+            width: 18vw;
+            max-width: 80px;
+            max-height: 60px;
+          }
+        }
+        @media (max-width: 600px) {
+          .pdp-flex-row {
+            flex-direction: column;
+            align-items: center;
+            width: 100vw;
+            box-sizing: border-box;
+            padding: 0 2vw;
+          }
+          .pdp-inner {
+            flex-direction: column;
+            width: 100vw;
+            min-width: 0;
+            max-width: 100vw;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0 2vw;
+            box-sizing: border-box;
+          }
+          .pdp-image-placeholder {
+            width: 100vw;
+            max-width: 100vw;
+            min-width: 0;
+            max-height: 200px;
+            box-sizing: border-box;
+            padding: 0 2vw;
+          }
+          .pdp-info {
+            padding: 4vw 2vw 2vw 2vw;
+            box-sizing: border-box;
+            width: 100vw;
+            max-width: 100vw;
+          }
+          .pdp-thumbnails {
+            flex-direction: row;
+            gap: 6px;
+            margin-right: 0;
+            margin-bottom: 10px;
+            padding: 0 2vw;
+            box-sizing: border-box;
+          }
+          .pdp-thumbnails img {
+            width: 28vw;
+            max-width: 60px;
+            max-height: 40px;
+          }
+        }
+        html, body, #root {
+          width: 100vw;
+          min-width: 0;
+          overflow-x: hidden;
+        }
       `}</style>
-      <div style={styles.pdpOuter}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginRight: '16px' }}>
-            {images.map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`Thumbnail ${idx + 1}`}
-                width={79}
-                height={80}
-                style={{ objectFit: 'contain', borderRadius: 2, fontFamily: 'Raleway, sans-serif' }}
-              />
-            ))}
+      <div className="pdp-flex-row">
+        <div className="pdp-thumbnails">
+          {images.map((img, idx) => (
+            <img
+              key={idx}
+              src={img}
+              alt={`Thumbnail ${idx + 1}`}
+              style={{ cursor: 'pointer', border: selectedImageIdx === idx ? '2px solid #5ece7b' : '1px solid #e0e0e0' }}
+              onClick={() => setSelectedImageIdx(idx)}
+            />
+          ))}
+        </div>
+        <div className="pdp-inner">
+          <div className="pdp-image-placeholder">
+            <img src={mainImages[selectedImageIdx]} alt={product.name} />
           </div>
-          <div style={styles.pdpInner}>
-            <div style={styles.pdpImagePlaceholder}>
-              <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', fontFamily: 'Raleway, sans-serif' }} />
+          <div className="pdp-info">
+            <h1 style={{
+              fontFamily: 'Source Sans Pro, sans-serif',
+              fontWeight: 400,
+              fontSize: 16,
+              lineHeight: '18px',
+              letterSpacing: '5%',
+              textAlign: 'left',
+              margin: 0,
+              marginBottom: 8
+            }}>{product.name}</h1>
+            <div style={{
+              color: '#888',
+              fontSize: 18,
+              margin: '0 0 40px 0',
+              fontWeight: 400,
+              fontFamily: 'Raleway, sans-serif',
+              fontStyle: 'normal',
+              textAlign: 'left'
+            }}>{product.explanation}</div>
+            <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start' }}>SIZE:</div>
+            <div style={{ ...styles.pdpSizes, paddingLeft: 0, alignSelf: 'flex-start' }}>
+              {sizes.map(size => (
+                <button
+                  key={size}
+                  style={
+                    selectedSize === size
+                      ? { ...styles.pdpSizeBtn, ...styles.pdpSizeBtnSelected, fontWeight: 400 }
+                      : { ...styles.pdpSizeBtn, fontWeight: 400 }
+                  }
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </button>
+              ))}
             </div>
-            <div style={styles.pdpInfo}>
-              <h1 style={{
-                fontFamily: 'Source Sans Pro, sans-serif',
-                fontWeight: 400,
-                fontSize: 16,
-                lineHeight: '18px',
-                letterSpacing: '5%',
-                textAlign: 'left',
-                margin: 0,
-                marginBottom: 8
-              }}>{product.name}</h1>
-              <div style={{
-                color: '#888',
-                fontSize: 18,
-                margin: '0 0 40px 0',
-                fontWeight: 400,
-                fontFamily: 'Raleway, sans-serif',
-                fontStyle: 'normal',
-                textAlign: 'left'
-              }}>{product.explanation}</div>
-              <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start' }}>SIZE:</div>
-              <div style={{ ...styles.pdpSizes, paddingLeft: 0, alignSelf: 'flex-start' }}>
-                {sizes.map(size => (
-                  <button
-                    key={size}
-                    style={
-                      selectedSize === size
-                        ? { ...styles.pdpSizeBtn, ...styles.pdpSizeBtnSelected, fontWeight: 400 }
-                        : { ...styles.pdpSizeBtn, fontWeight: 400 }
-                    }
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-              <div style={{ height: 64 }} />
-              <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start', marginBottom: 0 }}>PRICE:</div>
-              <div style={{ ...styles.pdpPricePlaceholder, fontWeight: 700, border: 'none', paddingLeft: 0, alignSelf: 'flex-start', marginTop: 4 }}>
-                {getSymbol(currency)}{getConverted(product.price).toFixed(2)}
-              </div>
-              <button
-                type="button"
-                style={{ ...styles.pdpAddToCart, fontWeight: 400 }}
-                onClick={handleAddToCart}
-              >
-                ADD TO CART
-              </button>
-              <div style={{ 
-                ...styles.pdpDescPlaceholder, 
-                display: 'flex', 
-                alignItems: 'center', 
-                color: '#444', 
-                fontSize: 16, 
-                fontWeight: 400, 
-                padding: '0 16px',
-                border: 'none',
-                background: '#fff',
-                fontFamily: 'Raleway, sans-serif'
-              }}>
-                {product.description}
-              </div>
+            <div style={{ height: 64 }} />
+            <div style={{ ...styles.pdpLabel, fontWeight: 700, paddingLeft: 0, alignSelf: 'flex-start', marginBottom: 0 }}>PRICE:</div>
+            <div style={{ ...styles.pdpPricePlaceholder, fontWeight: 700, border: 'none', paddingLeft: 0, alignSelf: 'flex-start', marginTop: 4 }}>
+              {getSymbol(currency)}{getConverted(product.price).toFixed(2)}
+            </div>
+            <button
+              type="button"
+              style={{ ...styles.pdpAddToCart, fontWeight: 400 }}
+              onClick={handleAddToCart}
+            >
+              ADD TO CART
+            </button>
+            <div style={{ 
+              ...styles.pdpDescPlaceholder, 
+              display: 'flex', 
+              alignItems: 'center', 
+              color: '#444', 
+              fontSize: 16, 
+              fontWeight: 400, 
+              padding: '0 16px',
+              border: 'none',
+              background: '#fff',
+              fontFamily: 'Raleway, sans-serif'
+            }}>
+              {product.description}
             </div>
           </div>
         </div>
