@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import down from './images/down.png'; 
-import ShippingMethodPage from './ShippingMethodPage';
 import { useNavigate } from 'react-router-dom';
-const dress = "https://i.pinimg.com/736x/73/fd/67/73fd6792c3f63f4b63de025b8f78adea.jpg";
+import { useCategory } from './NavigationBar';
 
 const StyledInput = ({ style, error, ...props }) => {
   const [focused, setFocused] = useState(false);
@@ -43,6 +42,7 @@ const StyledSelect = ({ style, children, error, ...props }) => {
 };
 
 const ShippingInfoPage = ({ contact: initialContact, address: initialAddress, cartItem, subtotal, onBack, onNext }) => {
+  const { cartItems = [], currency } = useCategory();
   const [form, setForm] = useState({
     email: '',
     firstName: '',
@@ -58,12 +58,6 @@ const ShippingInfoPage = ({ contact: initialContact, address: initialAddress, ca
   
   const [errors, setErrors] = useState({});
   
-  const demoCartItem = {
-    name: "Running Short",
-    price: 50.00,
-    qty: 1
-  };
-
   const inputStyle = {
     flex: 1,
     padding: 12,
@@ -73,8 +67,11 @@ const ShippingInfoPage = ({ contact: initialContact, address: initialAddress, ca
     boxSizing: 'border-box'
   };
 
-  cartItem = cartItem || demoCartItem;
-  subtotal = subtotal || demoCartItem.price;
+  const currencySymbols = { USD: '$', EUR: '€', JPY: '¥' };
+  const rates = { USD: 1, EUR: 0.92, JPY: 155 };
+  const getSymbol = (cur) => currencySymbols[cur] || '$';
+  const getConverted = (price) => (price * (rates[currency] || 1));
+  const total = cartItems.reduce((sum, item) => sum + getConverted(item.price) * (item.quantity || 1), 0);
 
   const validateForm = () => {
     const newErrors = {};
@@ -147,12 +144,16 @@ const navigate = useNavigate();
 const handleContinue = () => {
   if (validateForm()) {
     if (onNext) onNext(form);
-    navigate('/shipping', { state: { contact: form.email, address: `${form.address}, ${form.postalCode}, ${form.city}, ${form.province} ${form.country}` } });
+    navigate('/shipping', {
+      state: {
+        contact: form.email,
+        address: `${form.address}, ${form.postalCode}, ${form.city}, ${form.province} ${form.country}`,
+        cartItems: cartItems,
+        currency: currency
+      }
+    });
   }
 };
-
-
-
 
   return (
     <div style={{ display: 'flex', background: '#fafafa', minHeight: '100vh', margin: '0 auto' }}>
@@ -437,7 +438,7 @@ const handleContinue = () => {
               paddingTop: 24
             }}>
               <button
-                onClick={onBack}
+                onClick={() => navigate('/cart')}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -486,44 +487,47 @@ const handleContinue = () => {
         alignItems: 'flex-start',
       }}>
         <div style={{ width: '100%', maxWidth: 500 }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 32 }}>
-            <div style={{ position: 'relative', width: 110, height: 110, marginRight: 24 }}>
-              <img
-                src={dress}
-                alt={cartItem.name}
-                style={{
-                  width: 110,
-                  height: 110,
-                  borderRadius: 8,
-                  objectFit: 'cover',
-                  display: 'block'
-                }}
-              />
-              <div style={{
-                position: 'absolute',
-                top: -10,
-                right: -10,
-                background: '#6cbe8e',
-                color: '#fff',
-                borderRadius: '50%',
-                width: 28,
-                height: 28,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 600,
-                fontSize: 16,
-                boxShadow: '0 2px 8px #0001'
-              }}>
-                {cartItem.qty}
+          <div style={{ maxHeight: 390, overflowY: 'auto', marginBottom: 8, paddingRight: 8, paddingTop: 10 }}>
+            {cartItems.map((item, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', marginBottom: 32 }}>
+                <div style={{ position: 'relative', width: 110, height: 110, marginRight: 24 }}>
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    style={{
+                      width: 110,
+                      height: 110,
+                      borderRadius: 8,
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: -10,
+                    right: -10,
+                    background: '#6cbe8e',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    width: 28,
+                    height: 28,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    boxShadow: '0 2px 8px #0001'
+                  }}>
+                    {item.quantity}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 500, fontSize: 26, marginBottom: 8, color: '#272727' }}>{item.name} {item.size && (<span style={{fontWeight:400, fontSize:20, color:'#888'}}>({item.size})</span>)}</div>
+                  <div style={{ color: '#56B280', fontWeight: 600, fontSize: 20 }}>{getSymbol(currency)}{getConverted(item.price).toFixed(2)}</div>
+                </div>
               </div>
-            </div>
-            <div>
-              <div style={{ fontWeight: 500, fontSize: 26, marginBottom: 8, color: '#272727' }}>{cartItem.name}</div>
-              <div style={{ color: '#56B280', fontWeight: 600, fontSize: 20 }}>${cartItem.price.toFixed(2)}</div>
-            </div>
+            ))}
           </div>
-
           <div style={{ borderTop: '1px solid #e0e0e0', margin: '24px 0' }} />
           <div style={{
             marginBottom: 16,
@@ -532,7 +536,7 @@ const handleContinue = () => {
             fontSize: 14
           }}>
             <span style={{ color: '#666' }}>total</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{getSymbol(currency)}{total.toFixed(2)}</span>
           </div>
           <div style={{
             marginBottom: 44,
@@ -552,7 +556,7 @@ const handleContinue = () => {
             marginBottom: 24
           }}>
             <span>Total</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{getSymbol(currency)}{total.toFixed(2)}</span>
           </div>
         </div>
       </div>
