@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCategory } from './NavigationBar';
+import MenBlackShirt2 from './images/MenBlackShirt2.jpg';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
   const { cartItems = [], setCartItems, currency } = useCategory();
+  const navigate = useNavigate();
+
+  // For demo: each cart item uses an array of the same image (replace with real images if available)
+  const getImages = (item) =>
+    item.id === 18 ? [item.image, MenBlackShirt2, item.image] : [item.image, item.image, item.image];
+  const [imageIndexes, setImageIndexes] = useState(cartItems.map(() => 0));
+  const [animDirections, setAnimDirections] = useState(cartItems.map(() => ''));
 
   const currencySymbols = { USD: '$', EUR: '€', JPY: '¥' };
   const rates = { USD: 1, EUR: 0.92, JPY: 155 };
@@ -21,14 +30,47 @@ const CartPage = () => {
     });
   };
 
+  const handleContinue = () => {
+    navigate('/shippinginfo');
+  };
+
+  const handleImageChange = (idx, dir) => {
+    setAnimDirections(prev => {
+      const newDirs = [...prev];
+      newDirs[idx] = dir === 1 ? 'slide-right' : 'slide-left';
+      return newDirs;
+    });
+    setTimeout(() => {
+      setImageIndexes(prev => {
+        const images = getImages(cartItems[idx]);
+        const newIndexes = [...prev];
+        const len = images.length;
+        newIndexes[idx] = (newIndexes[idx] + dir + len) % len;
+        return newIndexes;
+      });
+      setTimeout(() => {
+        setAnimDirections(prev => {
+          const newDirs = [...prev];
+          newDirs[idx] = '';
+          return newDirs;
+        });
+      }, 300);
+    }, 10);
+  };
+
   return (
     <>
       <style>{`
         .cart-main {
           font-family: 'Raleway', sans-serif !important;
-          width: 100%;
+          width: 100vw;
+          min-width: 0;
+          min-height: 100vh;
           margin: 40px 0 0 0;
           padding: 0 80px 120px 80px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          box-sizing: border-box;
         }
         .cart-title {
           font-weight: 700;
@@ -169,6 +211,15 @@ const CartPage = () => {
           border-radius: 2px;
           object-fit: contain;
           background: #f8f8f8;
+          transition: transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s cubic-bezier(.4,0,.2,1);
+        }
+        .cart-img-anim.slide-left {
+          transform: translateX(-60px);
+          opacity: 0.5;
+        }
+        .cart-img-anim.slide-right {
+          transform: translateX(60px);
+          opacity: 0.5;
         }
         .cart-image-arrows {
           position: absolute;
@@ -236,6 +287,84 @@ const CartPage = () => {
           align-items: center;
           justify-content: center;
         }
+        @media (max-width: 900px) {
+          .cart-main {
+            padding: 0 2vw 80px 2vw;
+          }
+          .cart-item-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 18px;
+          }
+          .cart-item-details-main {
+            margin-right: 0;
+            width: 100%;
+          }
+          .cart-qty-controls {
+            flex-direction: row;
+            gap: 18px;
+            margin: 18px 0;
+          }
+          .cart-item-image {
+            width: 100%;
+            min-width: 0;
+            height: 180px;
+            min-height: 80px;
+            margin-left: 0;
+          }
+          .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 180px;
+          }
+        }
+        @media (max-width: 600px) {
+          .cart-main {
+            padding: 0 1vw 40px 1vw;
+          }
+          .cart-item-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 18px 0 10px 0;
+          }
+          .cart-item-details-main {
+            margin-right: 0;
+            width: 100%;
+          }
+          .cart-qty-controls {
+            flex-direction: row;
+            gap: 10px;
+            margin: 10px 0;
+          }
+          .cart-item-image {
+            width: 100vw;
+            min-width: 0;
+            height: 120px;
+            min-height: 60px;
+            margin-left: 0;
+          }
+          .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 120px;
+          }
+          .cart-summary-row {
+            width: 100%;
+            align-items: stretch;
+          }
+          .cart-continue-btn {
+            width: 100%;
+            min-width: 0;
+          }
+        }
+        html, body, #root {
+          width: 100vw;
+          min-width: 0;
+          overflow-x: hidden;
+        }
       `}</style>
       <div className="cart-main">
         <h2 className="cart-title" style={{marginLeft: 0, paddingLeft: 0}}>CART</h2>
@@ -275,10 +404,14 @@ const CartPage = () => {
                 >-</button>
               </div>
               <div className="cart-item-image">
-                <img src={item.image} alt={item.name} />
+                <img 
+                  src={getImages(item)[imageIndexes[idx] || 0]} 
+                  alt={item.name} 
+                  className={animDirections[idx] ? `cart-img-anim ${animDirections[idx]}` : ''}
+                />
                 <div className="cart-image-arrows">
-                  <button className="cart-arrow-btn" tabIndex={-1} aria-label="Previous image">{'<'}</button>
-                  <button className="cart-arrow-btn" tabIndex={-1} aria-label="Next image">{'>'}</button>
+                  <button className="cart-arrow-btn" tabIndex={-1} aria-label="Previous image" onClick={() => handleImageChange(idx, -1)}>{'<'}</button>
+                  <button className="cart-arrow-btn" tabIndex={-1} aria-label="Next image" onClick={() => handleImageChange(idx, 1)}>{'>'}</button>
                 </div>
               </div>
             </div>
@@ -293,7 +426,7 @@ const CartPage = () => {
               <span>Total: <b>{getSymbol(currency)}{totalPrice.toFixed(2)}</b></span>
             </div>
           </div>
-          <button className="cart-continue-btn">
+          <button className="cart-continue-btn" onClick={handleContinue} disabled={cartItems.length === 0} style={cartItems.length === 0 ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>
             CONTINUE
           </button>
         </div>
