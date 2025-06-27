@@ -5,6 +5,7 @@ import NavigationBar, { CategoryContext } from './NavigationBar.jsx';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import React, { useState } from 'react';
 import CartPage from './CartPage.jsx';
+import ShippingInfoPage from './ShippingInfoPage.jsx';
 import ShippingMethodPage from './ShippingMethodPage.jsx';
 import PaymentConfirmationPage from './PaymentConfirmationPage.jsx';
 
@@ -53,6 +54,7 @@ function App() {
             <Route path="/kids" element={<ProductListingPage />} />
             <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/shippinginfo" element={<ShippingInfoPage />} />
             <Route path="/shipping" element={<ShippingMethodPage />} />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/confirmation" element={<PaymentConfirmationPage />} />
