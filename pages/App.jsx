@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import React, { useState } from 'react';
 import CartPage from './CartPage.jsx';
 import ShippingMethodPage from './ShippingMethodPage.jsx';
+import PaymentConfirmationPage from './PaymentConfirmationPage.jsx';
 
 const CategoryProvider = ({ children }) => {
   const location = useLocation();
@@ -53,6 +54,8 @@ function App() {
             <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/shipping" element={<ShippingMethodPage />} />
+            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/confirmation" element={<PaymentConfirmationPage />} />
           </Routes>
         </CategoryProvider>
       </BrowserRouter>
