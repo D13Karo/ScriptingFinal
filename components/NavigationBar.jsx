@@ -43,20 +43,32 @@ const NavigationBar = () => {
     <>
       <style>{`
         .nav-header {
-          font-family: 'Raleway', sans-serif !important;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 1440px;
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: 100vw;
           height: 80px;
-          padding: 0 52px;
-          background: #ffffff;
-          position: relative;
+          background: #fff;
+          z-index: 120;
+          box-shadow: 0 2px 16px rgba(255, 255, 255, 0.08);
+        }
+        .nav-header-inner {
+          font-family: 'Raleway', sans-serif !important;
+          display: grid;
+          grid-template-columns: minmax(0, 2fr) auto minmax(0, 2fr);
+          align-items: center;
+          width: 100%;
+          max-width: 1200px;
+          min-width: 320px;
+          height: 80px;
+          margin: 0 auto;
+          box-sizing: border-box;
         }
         .nav-links {
           display: flex;
           gap: 24px;
-          margin-left: 40px;
+          justify-self: left;
+          padding-left: 0;
         }
         .nav-link {
           cursor: pointer;
@@ -71,13 +83,15 @@ const NavigationBar = () => {
         .logo {
           font-size: 24px;
           color: #5ece7b;
+          justify-self: center;
         }
         .nav-actions {
           display: flex;
           align-items: center;
           gap: 20px;
           position: relative;
-          margin-right: 40px;
+          justify-self: right;
+          padding-right: 0;
         }
         .currency-selector {
           cursor: pointer;
@@ -148,7 +162,7 @@ const NavigationBar = () => {
           height: 625px;
           background: #ffffff;
           padding: 32px 16px 32px 16px;
-          box-shadow: 0px 0px 36px rgba(168, 172, 176, 0.19);
+          box-shadow: 0px 0px 36px rgba(255, 255, 255, 0.19);
           display: flex;
           flex-direction: column;
           gap: 32px;
@@ -420,106 +434,114 @@ const NavigationBar = () => {
           }}
         ></div>
       )}
-      <header className="nav-header" style={{ position: 'relative', zIndex: 30 }}>
-        <nav className="nav-links">
-          {['WOMEN', 'MEN', 'KIDS'].map((cat) => (
-            <span
-              key={cat}
-              className={`nav-link ${activeCategory === cat ? 'active' : ''}`}
-              onClick={() => handleCategoryClick(cat)}
-            >
-              {cat}
-            </span>
-          ))}
-        </nav>
-        <div className="logo">
-          <FiShoppingBag className="green-bag" />
-        </div>
-        <div className="nav-actions">
-          <div className="currency-selector" onClick={toggleCurrency}>
-            <span className="currency-main">{getSymbol(currency)} <span className="arrow">{currencyOpen ? 'ˆ' : 'ˇ'}</span></span>
-            {currencyOpen && (
-              <div className="currency-dropdown">
-                <div onClick={() => handleCurrencySelect('USD')}><span className="currency-symbol">$</span>&nbsp;USD</div>
-                <div onClick={() => handleCurrencySelect('EUR')}><span className="currency-symbol">€</span>&nbsp;EUR</div>
-                <div onClick={() => handleCurrencySelect('JPY')}><span className="currency-symbol">¥</span>&nbsp;JPY</div>
+      <header className="nav-header">
+        <div className="nav-header-inner">
+          <nav className="nav-links">
+            {['WOMEN', 'MEN', 'KIDS'].map((cat) => (
+              <span
+                key={cat}
+                className={`nav-link ${activeCategory === cat ? 'active' : ''}`}
+                onClick={() => handleCategoryClick(cat)}
+              >
+                {cat}
+              </span>
+            ))}
+          </nav>
+          <div className="logo">
+            <FiShoppingBag className="green-bag" />
+          </div>
+          <div className="nav-actions">
+            <div className="currency-selector" onClick={toggleCurrency}>
+              <span className="currency-main">{getSymbol(currency)} <span className="arrow">{currencyOpen ? 'ˆ' : 'ˇ'}</span></span>
+              {currencyOpen && (
+                <div className="currency-dropdown">
+                  <div onClick={() => handleCurrencySelect('USD')}><span className="currency-symbol">$</span>&nbsp;USD</div>
+                  <div onClick={() => handleCurrencySelect('EUR')}><span className="currency-symbol">€</span>&nbsp;EUR</div>
+                  <div onClick={() => handleCurrencySelect('JPY')}><span className="currency-symbol">¥</span>&nbsp;JPY</div>
+                </div>
+              )}
+            </div>
+            <div className="cart-icon" onClick={toggleCart}>
+              <FaShoppingCart />
+              <span className="cart-count">{cartCount}</span>
+            </div>
+            {miniCartOpen && (
+              <div className="mini-cart">
+                {cartItems.length === 0 ? null : (
+                  <h4><span className="bag-title">My Bag,</span> {cartCount} items</h4>
+                )}
+                <div className="mini-cart-inner">
+                  {cartItems.length === 0 ? (
+                    <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 18 }}>
+                      Your cart is empty.
+                    </div>
+                  ) : (
+                    <>
+                      <div className="cart-items">
+                        {cartItems.map((item, idx) => (
+                          <div key={idx} className="cart-item">
+                            <div className="cart-item-details">
+                              <div className="item-name">{item.name}</div>
+                              <span className="item-price">{getSymbol(currency)}{getConverted(item.price).toFixed(2)}</span>
+                              <div className="item-size-label">Size:</div>
+                              <div className="item-size-selector">
+                                {['XS', 'S', 'M', 'L'].map((size) => (
+                                  <span
+                                    key={size}
+                                    className={`size-rect${item.size === size ? ' selected' : ''}`}
+                                  >
+                                    {size}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="cart-item-controls">
+                              <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx ? { ...ci, quantity: ci.quantity + 1 } : ci))}>+</button>
+                              <div className="item-qty">{item.quantity}</div>
+                              <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => {
+                                if (i === idx) {
+                                  if (ci.quantity > 1) return { ...ci, quantity: ci.quantity - 1 };
+                                  return null;
+                                }
+                                return ci;
+                              }).filter(Boolean))}>-</button>
+                            </div>
+                            <img src={item.image} alt={item.name} />
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                {cartItems.length > 0 && (
+                  <div className="cart-total">
+                    <span className="cart-total-label">Total:</span>
+                    <span className="cart-total-amount">{getSymbol(currency)}{total.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="cart-buttons">
+                  <button
+                    className="view-bag"
+                    onClick={() => {
+                      setMiniCartOpen(false);
+                      navigate('/cart');
+                    }}
+                  >
+                    VIEW BAG
+                  </button>
+                  <button className="checkout" onClick={() => {
+                    if (cartItems.length > 0) {
+                      setMiniCartOpen(false);
+                      navigate('/shippinginfo');
+                    }
+                  }}>CHECK OUT</button>
+                </div>
               </div>
             )}
           </div>
-          <div className="cart-icon" onClick={toggleCart}>
-            <FaShoppingCart />
-            <span className="cart-count">{cartCount}</span>
-          </div>
-          {miniCartOpen && (
-            <div className="mini-cart">
-              {cartItems.length === 0 ? null : (
-                <h4><span className="bag-title">My Bag,</span> {cartCount} items</h4>
-              )}
-              <div className="mini-cart-inner">
-                {cartItems.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 18 }}>
-                    Your cart is empty.
-                  </div>
-                ) : (
-                  <>
-                    <div className="cart-items">
-                      {cartItems.map((item, idx) => (
-                        <div key={idx} className="cart-item">
-                          <div className="cart-item-details">
-                            <div className="item-name">{item.name}</div>
-                            <span className="item-price">{getSymbol(currency)}{getConverted(item.price).toFixed(2)}</span>
-                            <div className="item-size-label">Size:</div>
-                            <div className="item-size-selector">
-                              {['XS', 'S', 'M', 'L'].map((size) => (
-                                <span
-                                  key={size}
-                                  className={`size-rect${item.size === size ? ' selected' : ''}`}
-                                >
-                                  {size}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="cart-item-controls">
-                            <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => i === idx ? { ...ci, quantity: ci.quantity + 1 } : ci))}>+</button>
-                            <div className="item-qty">{item.quantity}</div>
-                            <button className="qty-btn" onClick={() => setCartItems(cartItems.map((ci, i) => {
-                              if (i === idx) {
-                                if (ci.quantity > 1) return { ...ci, quantity: ci.quantity - 1 };
-                                return null;
-                              }
-                              return ci;
-                            }).filter(Boolean))}>-</button>
-                          </div>
-                          <img src={item.image} alt={item.name} />
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-              {cartItems.length > 0 && (
-                <div className="cart-total">
-                  <span className="cart-total-label">Total:</span>
-                  <span className="cart-total-amount">{getSymbol(currency)}{total.toFixed(2)}</span>
-                </div>
-              )}
-              <div className="cart-buttons">
-                <button
-                  className="view-bag"
-                  onClick={() => {
-                    setMiniCartOpen(false);
-                    navigate('/cart');
-                  }}
-                >
-                  VIEW BAG
-                </button>
-                <button className="checkout">CHECK OUT</button>
-              </div>
-            </div>
-          )}
         </div>
       </header>
+      <div style={{ height: 80 }}></div>
     </>
   );
 };
