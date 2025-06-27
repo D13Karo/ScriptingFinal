@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PaymentPage from './PaymentPage';
+import { useLocation } from 'react-router-dom'
 
 
 const dress = "https://i.pinimg.com/736x/73/fd/67/73fd6792c3f63f4b63de025b8f78adea.jpg"; 
@@ -14,6 +16,12 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
   cartItem = cartItem || demoCartItem;
   subtotal = subtotal || demoCartItem.price;
   
+ const navigate = useNavigate();
+ const location = useLocation();
+
+  const contact = location.state?.contact || '';
+  const address = location.state?.address || '';
+
   const [shipping, setShipping] = useState('standard');
   const [showPayment, setShowPayment] = useState(false);
 
@@ -65,7 +73,7 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
         <div
           style={{
             width: '100%',
-            maxWidth: 500, 
+            maxWidth: 445, 
             marginBottom: 24
           }}
         >
@@ -103,7 +111,7 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
                 </label>
                 <input
                   type="email"
-                  value={initialContact || ''}
+                  value={contact}
                   readOnly
                   style={{
                     flex: 1,
@@ -131,7 +139,7 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
                 </label>
                 <input
                   type="text"
-                  value={initialAddress || ''}
+                  value={address}
                   readOnly
                   style={{
                     flex: 1,
@@ -170,8 +178,7 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
                       marginBottom: 20,
                       background: '#fff',
                       cursor: 'pointer',
-                      boxShadow: 'none',
-                      transition: 'border 0.2s, background 0.2s'
+                      boxShadow: 'none'
                     }}
                   >
                     <input
@@ -182,8 +189,7 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
                       style={{
                         marginRight: 20,
                         width: 18,
-                        height: 18,
-                        accentColor: '#1976d2', 
+                        height: 18
                       }}
                     />
                     <div style={{ flex: 1, fontSize: 17, color: '#222', fontWeight: 500 }}>{opt.label}</div>
@@ -207,11 +213,11 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
             paddingTop: 24
           }}>
             <button 
-              onClick={onBack} 
+             onClick={() => navigate('/shippinginfo')}
               style={{ 
                 background: 'none', 
                 border: 'none', 
-                color: '#6cbe8e', 
+                color: '#56B280', 
                 fontWeight: 600, 
                 cursor: 'pointer',
                 fontSize: 16,
@@ -227,7 +233,7 @@ const ShippingMethodPage = ({ contact: initialContact, address: initialAddress, 
               onClick={() => setShowPayment(true)}
               disabled={!shipping}
               style={{
-                background: shipping ? '#6cbe8e' : '#ccc',
+                background: shipping ? '#56B280' : '#ccc',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 6,
