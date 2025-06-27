@@ -99,14 +99,23 @@ const ProductListingPage = () => {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
+        html, body, #root {
+          width: 100vw;
+          min-width: 0;
+          box-sizing: border-box;
+        }
         .raleway-font { font-family: 'Raleway', sans-serif !important; }
         .product-listing-container, .category-header, .category-title, .products-grid, .product-card, .product-image, .add-to-cart-btn, .product-info, .product-name, .product-price, .out-of-stock-overlay, .category-selector, .category-btn {
           font-family: 'Raleway', sans-serif !important;
         }
         .product-listing-container {
-          padding: 40px 40px 0 40px;
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 40px 32px 0 32px;
           background: #fff;
           min-height: 100vh;
+          box-sizing: border-box;
         }
         .category-header {
           margin-bottom: 0;
@@ -116,7 +125,7 @@ const ProductListingPage = () => {
           height: 68px;
           position: relative;
           top: -30px;
-          left: 90px;
+          left: -10px;
           font-family: 'Raleway', sans-serif;
           font-weight: 400;
           font-size: 42px;
@@ -128,12 +137,14 @@ const ProductListingPage = () => {
         }
         .products-grid {
           display: grid;
-          grid-template-columns: repeat(3, 386px);
-          gap: 60px 40px;
+          grid-template-columns: repeat(3, minmax(220px, 1fr));
+          gap: 4vw 2vw;
           justify-content: center;
           margin-left: auto;
           margin-right: auto;
           margin-bottom: 80px;
+          width: 100%;
+          max-width: 1200px;
         }
         .product-card {
           background: #fff;
@@ -146,7 +157,9 @@ const ProductListingPage = () => {
           display: flex;
           flex-direction: column;
           align-items: stretch;
-          width: 386px;
+          width: 100%;
+          max-width: 386px;
+          min-width: 180px;
           height: 444px;
           position: relative;
           top: 30px;
@@ -157,8 +170,12 @@ const ProductListingPage = () => {
         }
         .product-image {
           position: relative;
-          width: 354px;
-          height: 330px;
+          width: 100%;
+          max-width: 354px;
+          min-width: 120px;
+          height: 33vw;
+          max-height: 330px;
+          min-height: 120px;
           background: #fafafa;
           display: flex;
           align-items: center;
@@ -213,16 +230,15 @@ const ProductListingPage = () => {
         .product-info {
           padding: 0 16px;
           text-align: left;
-          width: 354px;
-          height: 58px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          background: #fff;
+          width: 100%;
+          max-width: 354px;
+          min-width: 120px;
         }
         .product-name {
           margin: 0;
-          width: 354px;
+          width: 100%;
+          max-width: 354px;
+          min-width: 120px;
           height: 29px;
           font-family: 'Raleway';
           font-size: 18px;
@@ -263,6 +279,54 @@ const ProductListingPage = () => {
           color: #8d8f9a;
           z-index: 2;
           pointer-events: none;
+        }
+        @media (max-width: 900px) {
+          .products-grid {
+            grid-template-columns: repeat(2, minmax(160px, 1fr));
+            gap: 4vw 2vw;
+            max-width: 98vw;
+          }
+          .product-card {
+            max-width: 340px;
+            height: 380px;
+          }
+          .product-image {
+            max-width: 300px;
+            height: 28vw;
+            max-height: 220px;
+          }
+          .product-info {
+            max-width: 300px;
+          }
+        }
+        @media (max-width: 600px) {
+          .products-grid {
+            grid-template-columns: 1fr;
+            gap: 18px 0;
+            max-width: 100vw;
+            padding: 0 2vw;
+          }
+          .product-card {
+            max-width: 98vw;
+            min-width: 0;
+            height: auto;
+            top: 0;
+          }
+          .product-image {
+            max-width: 98vw;
+            min-width: 0;
+            height: 40vw;
+            max-height: 160px;
+            min-height: 80px;
+          }
+          .product-info {
+            max-width: 98vw;
+            min-width: 0;
+          }
+          .product-name {
+            max-width: 98vw;
+            min-width: 0;
+          }
         }
       `}</style>
       <div className="product-listing-container raleway-font">
